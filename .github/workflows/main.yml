@@ -54,7 +54,7 @@ jobs:
       run: dotnet test --no-build --configuration Release --settings ./build/targets/tests/test.runsettings
 
     - name: Upload binlogs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: success() || failure()
       with:
         name: binlogs-${{ matrix.os }}
@@ -62,7 +62,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload *.received.* files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: failure()
       with:
         name: verify-test-results
@@ -70,14 +70,14 @@ jobs:
           **/*.received.*
 
     - name: Upload SARIF files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: success() || failure()
       with:
         name: SARIF files (${{ matrix.os }})
         path: ./artifacts/obj/**/*.sarif
 
     - name: Upload Test Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: success() || failure()
       with:
         name: .NET Test Reports (${{ matrix.os }})
@@ -85,7 +85,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Code Coverage Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       if: success() || failure()
       with:
         name: .NET Code Coverage Reports (${{ matrix.os }})
@@ -103,7 +103,7 @@ jobs:
         coverage-reports: ${{ github.workspace }}/artifacts/TestResults/coverage/Cobertura.xml
 
     - name: Upload packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: packages-${{ matrix.os }}
         path: |
