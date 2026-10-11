@@ -11,7 +11,7 @@ Use official .NET patterns, not forum shortcuts.
 ## Targets
 
 - The analyzer project targets `netstandard2.0`. Roslyn loads it in any host.
-- The test project targets `net8.0` and uses xUnit.
+- The test project targets `net10.0` and uses xUnit.
 - `LangVersion` is `default`. Do not pin it.
 - The SDK version comes from `global.json`.
 - Package versions live in `Directory.Packages.props`.
