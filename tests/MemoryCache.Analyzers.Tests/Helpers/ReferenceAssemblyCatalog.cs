@@ -19,6 +19,12 @@ public static class ReferenceAssemblyCatalog
     public static string Net80WithSystemRuntimeCaching => nameof(Net80WithSystemRuntimeCaching);
 
     /// <summary>
+    /// Gets the identifier for .NET Standard 2.0 reference assemblies with the System.Runtime.Caching package added.
+    /// Use this for tests targeting .NET Standard 2.0 with System.Runtime.Caching APIs.
+    /// </summary>
+    public static string NetStandard20WithSystemRuntimeCaching => nameof(NetStandard20WithSystemRuntimeCaching);
+
+    /// <summary>
     /// Gets the identifier for .NET Framework 4.6.2 reference assemblies with the System.Runtime.Caching package added.
     /// Use this for tests targeting .NET Framework 4.6.2 with System.Runtime.Caching APIs.
     /// </summary>
@@ -55,6 +61,10 @@ public static class ReferenceAssemblyCatalog
             {
                 nameof(Net80WithSystemRuntimeCaching),
                 ReferenceAssemblies.Net.Net80.AddPackages([new PackageIdentity("System.Runtime.Caching", "8.0.0")])
+            },
+            {
+                nameof(NetStandard20WithSystemRuntimeCaching),
+                ReferenceAssemblies.NetStandard.NetStandard20.AddPackages([new PackageIdentity("System.Runtime.Caching", "8.0.0")])
             },
             {
                 nameof(NetFramework462WithSystemRuntimeCaching),
