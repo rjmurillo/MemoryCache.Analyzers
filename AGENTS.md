@@ -31,8 +31,9 @@ claims against them.
 - `build/targets/` contains shared build and test configuration.
 
 The repository does not contain a code fix project or a benchmark project. Do
-not claim that a code fix exists, and do not require a code fix or benchmark
-unless the requested change adds one.
+not claim that a code fix or benchmark exists. Follow
+`.github/copilot-instructions.md` for requirements that apply when adding an
+analyzer.
 
 ## Change requirements
 
