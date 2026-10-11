@@ -12,3 +12,4 @@
 - [Installation](https://github.com/rjmurillo/MemoryCache.Analyzers/blob/main/docs/install.md)
 - [Configuration](https://github.com/rjmurillo/MemoryCache.Analyzers/blob/main/docs/configuration.md)
 - [Migrating from System.Runtime.Caching](https://github.com/rjmurillo/MemoryCache.Analyzers/blob/main/docs/migrating-from-system-runtime-caching.md)
+- [GetOrCreate cache stampede](https://github.com/rjmurillo/MemoryCache.Analyzers/blob/main/docs/getorcreate-stampede.md)

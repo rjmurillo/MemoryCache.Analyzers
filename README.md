@@ -63,6 +63,10 @@ To run the tests:
 dotnet test
 ```
 
+## Guides
+
+- [GetOrCreate is not atomic: cache stampede in IMemoryCache](docs/getorcreate-stampede.md)
+
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
