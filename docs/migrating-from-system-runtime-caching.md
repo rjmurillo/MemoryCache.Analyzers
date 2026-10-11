@@ -279,8 +279,8 @@ These answers cover the questions that come up most during a migration.
 ### Should I use MemoryCache or IMemoryCache in .NET Core?
 
 Use `IMemoryCache`. Microsoft recommends it over `System.Runtime.Caching`
-because it integrates better with ASP.NET Core, including dependency
-injection.
+because it integrates better with ASP.NET Core, and
+`services.AddMemoryCache()` registers it for dependency injection.
 
 ### Is System.Runtime.Caching supported in .NET 8?
 
