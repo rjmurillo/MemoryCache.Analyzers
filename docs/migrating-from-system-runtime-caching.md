@@ -305,7 +305,8 @@ change monitors to change tokens, and callbacks. See the
 It is safe to call from many threads, but the factory can run more than once
 for the same key. Use HybridCache or the
 [single-flight patterns in memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
-when the factory must run once.
+when the factory must run once. For the cause and a tested per-key lock, see
+[GetOrCreate is not atomic](getorcreate-stampede.md).
 
 ### Does HybridCache require .NET 9?
 
