@@ -135,7 +135,7 @@ a `CancellationToken` and returns a `ValueTask<T>`.
 
 Know these limits before you switch:
 
-- HybridCache shipped with .NET 9, but it does not require .NET 9. The
+- HybridCache was introduced with .NET 9, but it does not require .NET 9. The
   [HybridCache article](https://learn.microsoft.com/aspnet/core/performance/caching/hybrid)
   says the library "supports older .NET runtimes, down to .NET Framework 4.7.2
   and .NET Standard 2.0." It runs on .NET 8 too.
@@ -307,8 +307,8 @@ HybridCache, which came later, provides stampede protection.
 
 ### Does HybridCache need .NET 9?
 
-No. It shipped with .NET 9, but it runs on .NET 8 and supports runtimes down to
-.NET Framework 4.7.2 and .NET Standard 2.0.
+No. It was introduced with .NET 9, but it runs on .NET 8 and supports runtimes
+down to .NET Framework 4.7.2 and .NET Standard 2.0.
 
 ### Does HybridCache stop stampedes across servers?
 
