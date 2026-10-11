@@ -1,5 +1,12 @@
 # Migrate from System.Runtime.Caching.MemoryCache to IMemoryCache
 
+In .NET Core and later, use `IMemoryCache` from
+Microsoft.Extensions.Caching.Memory; Microsoft recommends it over
+`System.Runtime.Caching.MemoryCache`, which is a compatibility bridge for
+porting. This guide shows how to migrate System.Runtime.Caching to
+Microsoft.Extensions.Caching.Memory: the API mapping, before and after code,
+and the behavior gotchas.
+
 [`SRC1000`](rules/SRC1000.md) reports construction of
 `System.Runtime.Caching.MemoryCache` and derived types in .NET Core and later
 applications. It does not report `MemoryCache.Default` or other member access,
@@ -16,6 +23,23 @@ This guide covers the API and behavior changes that require attention during a
 migration. It does not cover distributed caching. Both cache implementations
 store data in the current process, so each application instance has its own
 cache.
+
+## MemoryCache vs IMemoryCache
+
+Use `IMemoryCache` for new code on .NET Core and later. The
+`Microsoft.Extensions.Caching.Memory` NuGet package provides the
+`Microsoft.Extensions.Caching.Memory.MemoryCache` implementation of
+`IMemoryCache`. The table shows where the two caches differ.
+
+| Topic | `System.Runtime.Caching.MemoryCache` | `IMemoryCache` |
+| --- | --- | --- |
+| Package | [System.Runtime.Caching](https://www.nuget.org/packages/System.Runtime.Caching) | [Microsoft.Extensions.Caching.Memory](https://www.nuget.org/packages/Microsoft.Extensions.Caching.Memory) |
+| Dependency injection | No registration method. Code often uses the static `MemoryCache.Default`. | `services.AddMemoryCache()` registers a singleton. |
+| Named caches | The constructor takes a name. | No name through the 10.x packages. Register a separate instance when a cache needs its own options. |
+| Memory limits | A megabyte limit, a percentage of physical memory, and memory polling. | `SizeLimit` in units the application defines. The runtime does not limit the cache based on memory pressure. |
+| Null values | Rejected. | Allowed. |
+| Absolute and sliding expiration on one entry | Throws an exception. | Allowed. The absolute expiration caps the sliding one. |
+| One factory run per key | No factory API. `AddOrGetExisting` takes a value that is already built. | Not guaranteed. `GetOrCreate` can run the factory more than once for a key. |
 
 ## Add the package and register the cache
 
@@ -38,7 +62,7 @@ registers the cache as a singleton, so do not dispose an injected instance.
 | `System.Runtime.Caching` | `Microsoft.Extensions.Caching.Memory` | Migration notes |
 | --- | --- | --- |
 | `MemoryCache.Default` | Inject the singleton `IMemoryCache` registered by `AddMemoryCache` | There is no static default cache. |
-| `new MemoryCache("name")` | Register a separate service that owns a `Microsoft.Extensions.Caching.Memory.MemoryCache` | The new cache has no name. Use separate instances only when entries need different cache-wide options or lifetimes. |
+| `new MemoryCache("name")` | Register a separate service that owns a `Microsoft.Extensions.Caching.Memory.MemoryCache` | The 10.x and earlier packages give the cache no name. Use separate instances only when entries need different cache-wide options or lifetimes. |
 | `CacheItemPolicy` | `MemoryCacheEntryOptions` | Translate each policy property explicitly. The types are not interchangeable. |
 | `AbsoluteExpiration` | `AbsoluteExpiration` or `AbsoluteExpirationRelativeToNow` | A relative duration avoids calculating a timestamp at the call site. |
 | `SlidingExpiration` | `SlidingExpiration` | A sliding expiration does not extend an entry beyond an absolute expiration when both are set. |
@@ -220,10 +244,13 @@ move refresh work into the normal lookup path or a background service.
   concurrently. Add locking or another coordination mechanism when duplicate
   work is unsafe. The `Microsoft.Extensions.Caching.Hybrid` package provides
   [HybridCache](https://learn.microsoft.com/aspnet/core/performance/caching/hybrid)
-  with built-in stampede protection. It supports runtimes down to .NET
-  Framework 4.7.2 and .NET Standard 2.0. See the
+  with built-in stampede protection, even without a distributed cache. Its
+  package targets .NET 8 and later and .NET Standard 2.0, and Microsoft
+  Learn says it "supports older .NET runtimes, down to .NET Framework 4.7.2
+  and .NET Standard 2.0." For lighter options that keep `IMemoryCache`, see
+  the
   [single-flight guidance](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
-  for alternatives.
+  in memory-cache-solutions.
 * A legacy `Add` reports whether insertion succeeded, and
   `AddOrGetExisting` returns the prior value or null after a successful insert.
   Modern `GetOrCreate` returns the resulting value. Review code that depends on
@@ -245,12 +272,67 @@ move refresh work into the normal lookup path or a background service.
 * Avoid cache keys created directly from unbounded external input. They can
   cause uncontrolled memory growth.
 
+## FAQ
+
+These answers cover the questions that come up most during a migration.
+
+### Should I use MemoryCache or IMemoryCache in .NET Core?
+
+Use `IMemoryCache`. Microsoft recommends it over `System.Runtime.Caching`
+because it integrates better with ASP.NET Core, and
+`services.AddMemoryCache()` registers it for dependency injection.
+
+### Is System.Runtime.Caching supported in .NET 8?
+
+Yes, through the `System.Runtime.Caching` NuGet package, which targets .NET 8
+and later. Microsoft positions it as a compatibility bridge for porting, and
+SRC1000 warns when code creates a new instance.
+
+### What replaces MemoryCache.Default?
+
+Inject the singleton `IMemoryCache` that `services.AddMemoryCache()`
+registers. There is no static default cache.
+
+### What replaces CacheItemPolicy?
+
+Use `MemoryCacheEntryOptions`. Translate each property: expirations, priority,
+change monitors to change tokens, and callbacks. See the
+[API mapping](#api-mapping).
+
+### Is IMemoryCache.GetOrCreate thread safe?
+
+It is safe to call from many threads, but the factory can run more than once
+for the same key. Use HybridCache or the
+[single-flight patterns in memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
+when the factory must run once.
+
+### Does HybridCache require .NET 9?
+
+No. Microsoft Learn says HybridCache "supports older .NET runtimes, down to
+.NET Framework 4.7.2 and .NET Standard 2.0." The NuGet package also targets
+.NET 8.
+
+### Why do I get "Cache entry must specify a value for Size when SizeLimit is set."?
+
+A cache with `SizeLimit` requires `Size` on every entry. Set `Size` on each
+entry, or use a dedicated cache without a limit. See
+[Size limits](#size-limits).
+
+### Does SRC1000 catch MemoryCache.Default?
+
+No. SRC1000 reports construction only. Search the code for
+`MemoryCache.Default` to find the remaining uses.
+
 ## Official references
 
 * [ASP.NET Core in-memory caching](https://learn.microsoft.com/aspnet/core/performance/caching/memory)
+* [HybridCache library in ASP.NET Core](https://learn.microsoft.com/aspnet/core/performance/caching/hybrid)
 * [Caching in .NET](https://learn.microsoft.com/dotnet/core/extensions/caching)
 * [`IMemoryCache` API](https://learn.microsoft.com/dotnet/api/microsoft.extensions.caching.memory.imemorycache)
 * [`MemoryCacheEntryOptions` API](https://learn.microsoft.com/dotnet/api/microsoft.extensions.caching.memory.memorycacheentryoptions)
 * [`AddMemoryCache` API](https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.memorycacheservicecollectionextensions.addmemorycache)
 * [`System.Runtime.Caching.MemoryCache` API](https://learn.microsoft.com/dotnet/api/system.runtime.caching.memorycache)
 * [`CacheItemPolicy` API](https://learn.microsoft.com/dotnet/api/system.runtime.caching.cacheitempolicy)
+* [Microsoft.Extensions.Caching.Memory on NuGet](https://www.nuget.org/packages/Microsoft.Extensions.Caching.Memory)
+* [Microsoft.Extensions.Caching.Hybrid on NuGet](https://www.nuget.org/packages/Microsoft.Extensions.Caching.Hybrid)
+* [System.Runtime.Caching on NuGet](https://www.nuget.org/packages/System.Runtime.Caching)
