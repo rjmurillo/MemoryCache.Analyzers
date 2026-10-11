@@ -218,10 +218,10 @@ move refresh work into the normal lookup path or a background service.
 * `GetOrCreate` and `GetOrCreateAsync` do not guarantee that only one caller
   runs the factory for a missing key. Several callers can perform the load
   concurrently. Add locking or another coordination mechanism when duplicate
-  work is unsafe. On .NET 9 and later, the
-  `Microsoft.Extensions.Caching.Hybrid` package provides
+  work is unsafe. The `Microsoft.Extensions.Caching.Hybrid` package provides
   [HybridCache](https://learn.microsoft.com/aspnet/core/performance/caching/hybrid)
-  with built-in stampede protection. See the
+  with built-in stampede protection. It supports runtimes down to .NET
+  Framework 4.7.2 and .NET Standard 2.0. See the
   [single-flight guidance](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
   for other target frameworks.
 * A legacy `Add` reports whether insertion succeeded, and
