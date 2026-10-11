@@ -1,7 +1,8 @@
 # Migrate from System.Runtime.Caching.MemoryCache to IMemoryCache
 
-[`SRC1000`](rules/SRC1000.md) reports uses of
-`System.Runtime.Caching.MemoryCache` in .NET Core and later applications.
+[`SRC1000`](rules/SRC1000.md) reports construction of
+`System.Runtime.Caching.MemoryCache` and derived types in .NET Core and later
+applications.
 Microsoft describes that cache as a compatibility bridge for porting older
 ASP.NET applications and recommends
 `Microsoft.Extensions.Caching.Memory.IMemoryCache` for better integration with
