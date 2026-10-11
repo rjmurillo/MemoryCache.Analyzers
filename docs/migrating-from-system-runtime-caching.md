@@ -223,7 +223,8 @@ move refresh work into the normal lookup path or a background service.
   with built-in stampede protection. It supports runtimes down to .NET
   Framework 4.7.2 and .NET Standard 2.0. See the
   [single-flight guidance](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
-  for alternatives.
+  for alternatives, and
+  [GetOrCreate is not atomic](getorcreate-stampede.md) for the cause and fixes.
 * A legacy `Add` reports whether insertion succeeded, and
   `AddOrGetExisting` returns the prior value or null after a successful insert.
   Modern `GetOrCreate` returns the resulting value. Review code that depends on
