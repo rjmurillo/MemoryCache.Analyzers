@@ -146,7 +146,9 @@ Know these limits before you switch:
   still run the factory once.
 - HybridCache works without a distributed cache. With no `IDistributedCache`
   registered, it still provides in-process caching and stampede protection.
-- Keys are strings, and the default maximum key length is 1024 characters.
+- Keys are strings. The default maximum key length is 1024 characters
+  (`HybridCacheOptions.MaximumKeyLength`). Longer keys skip the cache, so they
+  get no stampede protection.
 
 ## Fix 2: FusionCache or other libraries
 
@@ -267,8 +269,8 @@ A common pattern stores a `Lazy<Task<T>>` with
 `cache.GetOrCreate(key, _ => new Lazy<Task<T>>(load))`. This narrows the race
 window, because creating a `Lazy` is fast. It does not close it. Callers that
 miss at the same moment each create their own `Lazy`, each run `Value`, and
-each start the load. In our tests with threads released at the same time, the
-load still ran more than once. If you use this pattern anyway, remove the entry
+each start the load. When several threads miss at the same moment, the load can
+still run more than once. If you use this pattern anyway, remove the entry
 when the task faults. Otherwise the cache keeps the failed task, and every later
 caller gets the same exception until the entry expires. `IMemoryCache` has no
 remove-if-unchanged call, so that removal can also evict a newer, healthy entry
