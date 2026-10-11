@@ -250,7 +250,8 @@ move refresh work into the normal lookup path or a background service.
   and .NET Standard 2.0." For lighter options that keep `IMemoryCache`, see
   the
   [single-flight guidance](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
-  in memory-cache-solutions.
+  in memory-cache-solutions, and
+  [GetOrCreate is not atomic](getorcreate-stampede.md) for the cause and fixes.
 * A legacy `Add` reports whether insertion succeeded, and
   `AddOrGetExisting` returns the prior value or null after a successful insert.
   Modern `GetOrCreate` returns the resulting value. Review code that depends on
@@ -304,7 +305,8 @@ change monitors to change tokens, and callbacks. See the
 It is safe to call from many threads, but the factory can run more than once
 for the same key. Use HybridCache or the
 [single-flight patterns in memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
-when the factory must run once.
+when the factory must run once. For the cause and a tested per-key lock, see
+[GetOrCreate is not atomic](getorcreate-stampede.md).
 
 ### Does HybridCache require .NET 9?
 
