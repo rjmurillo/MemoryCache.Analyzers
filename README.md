@@ -81,6 +81,13 @@ Use `.editorconfig` to change the severity of SRC1000:
 dotnet_diagnostic.SRC1000.severity = error
 ```
 
+## Guides
+
+- [Install MemoryCache.Analyzers](docs/install.md)
+- [Configure MemoryCache.Analyzers](docs/configuration.md)
+- [Migrate from System.Runtime.Caching.MemoryCache](docs/migrating-from-system-runtime-caching.md)
+- [GetOrCreate is not atomic: cache stampede in IMemoryCache](docs/getorcreate-stampede.md)
+
 ## Build and test
 
 The repository uses the .NET SDK version in `global.json`.
