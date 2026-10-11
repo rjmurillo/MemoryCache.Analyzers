@@ -65,9 +65,7 @@ diagnostics.
 | [SRC1000](docs/rules/SRC1000.md) | Compatibility | Warning | No | Avoid System.Runtime.Caching.MemoryCache in .NET Core+ |
 
 See the [rule reference](docs/rules/README.md) for implementation details.
-See the [migration guide](docs/migrating-from-system-runtime-caching.md),
-[installation guide](docs/install.md), and
-[configuration guide](docs/configuration.md) for next steps.
+See [Guides](#guides) for installation, configuration, and migration steps.
 
 For experimental patterns and decorators built on `IMemoryCache`, see
 [memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions).
