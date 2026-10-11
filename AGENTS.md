@@ -14,7 +14,7 @@ does not target .NET Framework.
 
 Read these files before making changes:
 
-- `.github/copilot-instructions.md`
+- `CLAUDE.md`
 - `CONTRIBUTING.md`
 - `docs/rules/README.md`
 - The implementation, tests, and rule page for the affected diagnostic
@@ -32,8 +32,7 @@ claims against them.
 
 The repository does not contain a code fix project or a benchmark project. Do
 not claim that a code fix or benchmark exists. Follow
-`.github/copilot-instructions.md` for requirements that apply when adding an
-analyzer.
+`CLAUDE.md` for requirements that apply when adding an analyzer.
 
 ## Change requirements
 
