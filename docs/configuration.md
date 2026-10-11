@@ -96,15 +96,12 @@ For example, a project targeting both .NET Framework 4.6.2 and .NET 8 reports SR
 
 <ItemGroup>
   <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0-alpha" PrivateAssets="all" />
-  <PackageReference
-    Include="System.Runtime.Caching"
-    Version="8.0.0"
-    Condition="'$(TargetFramework)' == 'net8.0'" />
+  <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
 </ItemGroup>
 ```
 
-The .NET Framework reference assemblies already contain `System.Runtime.Caching`. The package reference above makes
-the API available to the .NET 8 target. Run `dotnet build --no-incremental` to see output for each target.
+The `System.Runtime.Caching` package makes the API available to both target compilations. Run
+`dotnet build --no-incremental` to see output for each target.
 
 The analyzer identifies .NET Framework by the core library that defines `System.Object`. It skips a compilation when
 that assembly is `mscorlib`, and it analyzes a compilation when that assembly is `System.Private.CoreLib`. The test
