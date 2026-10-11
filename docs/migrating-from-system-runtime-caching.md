@@ -2,11 +2,15 @@
 
 [`SRC1000`](rules/SRC1000.md) reports construction of
 `System.Runtime.Caching.MemoryCache` and derived types in .NET Core and later
-applications.
-Microsoft describes that cache as a compatibility bridge for porting older
-ASP.NET applications and recommends
-`Microsoft.Extensions.Caching.Memory.IMemoryCache` for better integration with
-ASP.NET Core.
+applications. It does not report `MemoryCache.Default` or other member access,
+so search for `MemoryCache.Default` when planning a migration.
+
+Microsoft's [in-memory caching
+guidance](https://learn.microsoft.com/aspnet/core/performance/caching/memory)
+states that `IMemoryCache` "is recommended over
+`System.Runtime.Caching`/`MemoryCache` because it offers better integration with
+ASP.NET Core." It also says to use `System.Runtime.Caching`/`MemoryCache` "as a
+compatibility bridge when porting code from ASP.NET 4.x to ASP.NET Core."
 
 This guide covers the API and behavior changes that require attention during a
 migration. It does not cover distributed caching. Both cache implementations
@@ -15,9 +19,12 @@ cache.
 
 ## Add the package and register the cache
 
-Reference the `Microsoft.Extensions.Caching.Memory` package when the shared
-framework does not already provide it. Register the default implementation
-once during application startup:
+For a console app, the After sample requires the
+`Microsoft.Extensions.Caching.Memory` and
+`Microsoft.Extensions.DependencyInjection` packages. The latter provides
+`BuildServiceProvider`. ASP.NET Core apps receive both from the shared
+framework. Register the default implementation once during application
+startup:
 
 ```csharp
 services.AddMemoryCache();
@@ -181,6 +188,12 @@ whose units are defined by the application.
 
 When `SizeLimit` is set, every entry added to that cache must specify `Size`.
 Choose one unit, such as item count or estimated bytes, and use it consistently.
+An entry without a size throws this exception:
+
+```text
+Cache entry must specify a value for Size when SizeLimit is set.
+```
+
 Do not add a size limit to the shared DI cache when libraries or framework
 components may add entries without sizes. Create and register a dedicated
 cache instance instead.
@@ -205,7 +218,12 @@ move refresh work into the normal lookup path or a background service.
 * `GetOrCreate` and `GetOrCreateAsync` do not guarantee that only one caller
   runs the factory for a missing key. Several callers can perform the load
   concurrently. Add locking or another coordination mechanism when duplicate
-  work is unsafe.
+  work is unsafe. On .NET 9 and later, the
+  `Microsoft.Extensions.Caching.Hybrid` package provides
+  [HybridCache](https://learn.microsoft.com/aspnet/core/performance/caching/hybrid)
+  with built-in stampede protection. See the
+  [single-flight guidance](https://github.com/rjmurillo/memory-cache-solutions#recommended-alternatives-for-single-flight-cache-stampede-protection)
+  for other target frameworks.
 * A legacy `Add` reports whether insertion succeeded, and
   `AddOrGetExisting` returns the prior value or null after a successful insert.
   Modern `GetOrCreate` returns the resulting value. Review code that depends on
