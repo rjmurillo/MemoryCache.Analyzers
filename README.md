@@ -4,8 +4,9 @@
 [![Main build](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml/badge.svg)](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml)
 
 **MemoryCache.Analyzers** is a Roslyn analyzer that identifies creation of
-`System.Runtime.Caching.MemoryCache` in modern .NET projects, where
-`Microsoft.Extensions.Caching.Memory` is the recommended cache API.
+`System.Runtime.Caching.MemoryCache` in modern .NET projects. Microsoft's
+[ASP.NET Core caching guidance](https://learn.microsoft.com/aspnet/core/performance/caching/memory)
+recommends `Microsoft.Extensions.Caching.Memory` over that compatibility API.
 
 ## Example
 
@@ -48,13 +49,14 @@ Or add a package reference:
 ## Supported targets
 
 - Language: C#
-- Analyzed applications: .NET Core and .NET 5 or later
+- Analyzed applications: .NET Standard 2.0, .NET Core, and .NET 5 or later
 - Excluded applications: .NET Framework
 - Analyzer target framework: `netstandard2.0`
 
 SRC1000 reports only object creation for
 `System.Runtime.Caching.MemoryCache` or a type derived from it. Calls such as
-`Get` and `Set` do not produce diagnostics.
+`Get` and `Set`, other member access, and `MemoryCache.Default` do not produce
+diagnostics.
 
 ## Rules
 
@@ -63,6 +65,9 @@ SRC1000 reports only object creation for
 | [SRC1000](docs/rules/SRC1000.md) | Compatibility | Warning | No | Avoid System.Runtime.Caching.MemoryCache in .NET Core+ |
 
 See the [rule reference](docs/rules/README.md) for implementation details.
+
+For experimental patterns and decorators built on `IMemoryCache`, see
+[memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions).
 
 ## Configure severity
 

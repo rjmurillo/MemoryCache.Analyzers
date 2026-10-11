@@ -12,7 +12,13 @@ public class SystemRuntimeCachingAnalyzerTests
         IEnumerable<object[]> net80SystemRuntimeCaching = new object[][]
         {
             ["""var cache = {|SRC1000:new MemoryCache("test")|};"""],
+            ["""var cache = MemoryCache.Default; cache.Set("test", "value", System.DateTimeOffset.UtcNow.AddMinutes(1)); var value = cache.Get("test");"""],
         }.WithSystemRuntimeCachingNamespaces().WithNet80SystemRuntimeCaching();
+
+        IEnumerable<object[]> netStandard20SystemRuntimeCaching = new object[][]
+        {
+            ["""var cache = {|SRC1000:new MemoryCache("test")|};"""],
+        }.WithSystemRuntimeCachingNamespaces().WithNetStandard20SystemRuntimeCaching();
 
         IEnumerable<object[]> net80MicrosoftExtensionsCachingMemory = new object[][]
         {
@@ -30,6 +36,7 @@ public class SystemRuntimeCachingAnalyzerTests
         }.WithMicrosoftExtensionsCachingMemoryNamespaces().WithFramework462MicrosoftExtensionsCachingMemory();
 
         return net80SystemRuntimeCaching
+            .Union(netStandard20SystemRuntimeCaching)
             .Union(net80MicrosoftExtensionsCachingMemory)
             .Union(framework462SystemRuntimeCaching)
             .Union(framework462MicrosoftExtensionsCachingMemory);
