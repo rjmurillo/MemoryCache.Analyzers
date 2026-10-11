@@ -38,7 +38,9 @@ public class SystemRuntimeCachingAnalyzerTests
     [Fact]
     public void HelpLinkTargetsRuleDocumentation()
     {
-        Microsoft.CodeAnalysis.DiagnosticDescriptor diagnostic = Assert.Single(new SystemRuntimeCachingAnalyzer().SupportedDiagnostics);
+        SystemRuntimeCachingAnalyzer analyzer = new();
+
+        Microsoft.CodeAnalysis.DiagnosticDescriptor diagnostic = Assert.Single(analyzer.SupportedDiagnostics.ToArray());
 
         Assert.StartsWith("https://github.com/rjmurillo/MemoryCache.Analyzers/blob/", diagnostic.HelpLinkUri, StringComparison.Ordinal);
         Assert.EndsWith("/docs/rules/SRC1000.md", diagnostic.HelpLinkUri, StringComparison.Ordinal);
