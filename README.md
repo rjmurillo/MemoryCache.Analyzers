@@ -1,66 +1,81 @@
-# MemoryCache.Analyzers Rules
+# MemoryCache.Analyzers
 
-This document provides details about the rules included in the [MemoryCache.Analyzers](https://github.com/rjmurillo/memorycache.analyzers) package.
+[![NuGet Version](https://img.shields.io/nuget/vpre/MemoryCache.Analyzers?style=flat&logo=nuget&color=blue)](https://www.nuget.org/packages/MemoryCache.Analyzers)
+[![Main build](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml/badge.svg)](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml)
 
-## Purpose
+**MemoryCache.Analyzers** is a Roslyn analyzer that identifies creation of
+`System.Runtime.Caching.MemoryCache` in modern .NET projects. Microsoft's
+[ASP.NET Core caching guidance](https://learn.microsoft.com/aspnet/core/performance/caching/memory)
+recommends `Microsoft.Extensions.Caching.Memory` over that compatibility API.
 
-MemoryCache.Analyzers is a collection of Roslyn analyzers that help developers identify and fix issues related to caching APIs in .NET applications. The analyzers focus on ensuring proper usage of caching APIs and promoting best practices for performance, maintainability, and compatibility.
+## Example
 
-## Rule Categories
+SRC1000 reports the `MemoryCache` object creation in this C# code:
 
-Rules are organized into the following categories:
+```csharp
+using System;
+using System.Runtime.Caching;
 
-- **Compatibility**: Rules that identify code that may have compatibility issues between different .NET versions
+MemoryCache cache = new("orders"); // SRC1000
+cache.Set("order:42", "ready", DateTimeOffset.UtcNow.AddMinutes(5));
+```
 
-## Rule Severity
+Use `Microsoft.Extensions.Caching.Memory` instead:
 
-Each rule has a default severity level:
+```csharp
+using System;
+using Microsoft.Extensions.Caching.Memory;
 
-- **Error**: Indicates code that is likely to cause a significant issue
-- **Warning**: Indicates code that may cause issues but might be intentional in some cases
-- **Info**: Indicates code that could be improved but isn't likely to cause issues
-- **Hidden**: Informational rules that aren't shown by default
+using MemoryCache cache = new(new MemoryCacheOptions());
+cache.Set("order:42", "ready", TimeSpan.FromMinutes(5));
+```
+
+## Install
+
+The published package is a prerelease. Install it in each project to analyze:
+
+```shell
+dotnet add package MemoryCache.Analyzers --prerelease
+```
+
+Or add a package reference:
+
+```xml
+<PackageReference Include="MemoryCache.Analyzers"
+                  Version="0.1.0-alpha"
+                  PrivateAssets="all" />
+```
+
+## Supported targets
+
+- Language: C#
+- Analyzed applications: .NET Standard 2.0, .NET Core, and .NET 5 or later
+- Excluded applications: .NET Framework
+- Analyzer target framework: `netstandard2.0`
+
+SRC1000 reports only object creation for
+`System.Runtime.Caching.MemoryCache` or a type derived from it. Calls such as
+`Get` and `Set`, other member access, and `MemoryCache.Default` do not produce
+diagnostics.
 
 ## Rules
 
-| ID | Title | Category | Severity | Description |
-|----|-------|----------|----------|-------------|
-| [SRC1000](docs/rules/SRC1000.md) | Avoid System.Runtime.Caching.MemoryCache in .NET Core+ | Compatibility | Warning | System.Runtime.Caching.MemoryCache is a compatibility bridge for porting from .NET Framework. Prefer Microsoft.Extensions.Caching.Memory in .NET Core+. |
+| ID | Category | Severity | Code fix | Title |
+| --- | --- | --- | --- | --- |
+| [SRC1000](docs/rules/SRC1000.md) | Compatibility | Warning | No | Avoid System.Runtime.Caching.MemoryCache in .NET Core+ |
 
-## Using the Analyzers
+See the [rule reference](docs/rules/README.md) for implementation details.
 
-### Installation
+For experimental patterns and decorators built on `IMemoryCache`, see
+[memory-cache-solutions](https://github.com/rjmurillo/memory-cache-solutions).
 
-Install the analyzers via NuGet:
+## Configure severity
 
-```
-dotnet add package MemoryCache.Analyzers
-```
-
-### Configuration
-
-You can configure the severity of analyzer rules in your project using an `.editorconfig` file. For example:
+Use `.editorconfig` to change the severity of SRC1000:
 
 ```editorconfig
-# Increase the severity of SRC1000 from a warning to an error
+[*.cs]
 dotnet_diagnostic.SRC1000.severity = error
-
-# Disable SRC1000
-dotnet_diagnostic.SRC1000.severity = none
-```
-
-## Building and Testing
-
-To build the analyzers:
-
-```
-dotnet build
-```
-
-To run the tests:
-
-```
-dotnet test
 ```
 
 ## Guides
@@ -70,10 +85,15 @@ dotnet test
 - [Migrate from System.Runtime.Caching.MemoryCache](docs/migrating-from-system-runtime-caching.md)
 - [GetOrCreate is not atomic: cache stampede in IMemoryCache](docs/getorcreate-stampede.md)
 
-## Contributing
+## Build and test
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+The repository uses the .NET SDK version in `global.json`.
+
+```shell
+dotnet build MemoryCache.Analyzers.sln /p:PedanticMode=true
+dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/tests/test.runsettings
+```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MemoryCache.Analyzers is licensed under the [MIT License](LICENSE).

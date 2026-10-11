@@ -21,6 +21,20 @@ public static class TestDataExtensions
     }
 
     /// <summary>
+    /// Adds the .NET Standard 2.0 System.Runtime.Caching reference group identifier to each test data row.
+    /// Use for tests that require System.Runtime.Caching APIs on .NET Standard 2.0.
+    /// </summary>
+    /// <param name="data">The test data rows to enrich with reference assembly information.</param>
+    /// <returns>An enriched collection of test data rows with the .NET Standard 2.0 System.Runtime.Caching reference group identifier.</returns>
+    public static IEnumerable<object[]> WithNetStandard20SystemRuntimeCaching(this IEnumerable<object[]> data)
+    {
+        foreach (object[] item in data)
+        {
+            yield return item.Prepend(ReferenceAssemblyCatalog.NetStandard20WithSystemRuntimeCaching).ToArray();
+        }
+    }
+
+    /// <summary>
     /// Adds the .NET Framework 4.6.2 System.Runtime.Caching reference group identifier to each test data row.
     /// Use for tests that require System.Runtime.Caching APIs on .NET Framework 4.6.2.
     /// </summary>

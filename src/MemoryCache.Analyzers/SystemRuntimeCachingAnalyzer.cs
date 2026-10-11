@@ -22,7 +22,7 @@ public sealed class SystemRuntimeCachingAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         description: "System.Runtime.Caching.MemoryCache is a compatibility bridge for porting from .NET Framework. Prefer Microsoft.Extensions.Caching.Memory in .NET Core+.",
-        helpLinkUri: $"https://github.com/rjmurillo/system.runtime.caching.analyzers/blob/{ThisAssembly.GitCommitId}/docs/rules/{DiagnosticId}.md");
+        helpLinkUri: $"https://github.com/rjmurillo/MemoryCache.Analyzers/blob/{ThisAssembly.GitCommitId}/docs/rules/{DiagnosticId}.md");
 #pragma warning restore ECS1300
 
     /// <inheritdoc />
