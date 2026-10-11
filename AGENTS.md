@@ -3,7 +3,7 @@
 ## Repository scope
 
 MemoryCache.Analyzers is a C# Roslyn analyzer package. The analyzer project
-targets `netstandard2.0`. The test project targets `net8.0`. The required .NET
+targets `netstandard2.0`. The test project targets `net10.0`. The required .NET
 SDK is selected by `global.json`.
 
 The repository currently contains one rule, SRC1000. It reports object creation
