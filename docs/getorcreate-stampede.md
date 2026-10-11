@@ -44,10 +44,11 @@ Here is what happens when two requests ask for the same missing key:
 6. Caller B stores its value and replaces the value from caller A. The last
    write wins.
 
-`ConcurrentDictionary.GetOrAdd` behaves the same way. Its
+`ConcurrentDictionary.GetOrAdd` can also run its factory more than once. Its
 [documentation](https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentdictionary-2.getoradd)
-says the value factory may be called more than once when several threads call
-`GetOrAdd` at the same time.
+says the value factory may be called multiple times when several threads call
+`GetOrAdd` at the same time. One difference: `GetOrAdd` keeps only one value,
+while with `GetOrCreate` the last write wins.
 
 ## Is this a bug?
 
@@ -257,7 +258,8 @@ How it avoids the common traps:
   first caller stored and does not load it again.
 
 Register `KeyedCacheLoader` as a singleton. It only coordinates callers that
-share the same instance, in the same process.
+share the same instance, in the same process. It also assumes each key always
+holds a `T`. A value of another type counts as a miss and is replaced.
 
 ### Why not cache a `Lazy<Task<T>>`?
 
@@ -268,7 +270,9 @@ miss at the same moment each create their own `Lazy`, each run `Value`, and
 each start the load. In our tests with threads released at the same time, the
 load still ran more than once. If you use this pattern anyway, remove the entry
 when the task faults. Otherwise the cache keeps the failed task, and every later
-caller gets the same exception until the entry expires.
+caller gets the same exception until the entry expires. `IMemoryCache` has no
+remove-if-unchanged call, so that removal can also evict a newer, healthy entry
+that another caller stored. The keyed loader above avoids both problems.
 
 ## What does not fix it
 
