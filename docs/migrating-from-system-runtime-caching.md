@@ -35,7 +35,7 @@ Use `IMemoryCache` for new code on .NET Core and later. The
 | --- | --- | --- |
 | Package | [System.Runtime.Caching](https://www.nuget.org/packages/System.Runtime.Caching) | [Microsoft.Extensions.Caching.Memory](https://www.nuget.org/packages/Microsoft.Extensions.Caching.Memory) |
 | Dependency injection | No registration method. Code often uses the static `MemoryCache.Default`. | `services.AddMemoryCache()` registers a singleton. |
-| Named caches | The constructor takes a name. | No names. Register a separate instance when a cache needs its own options. |
+| Named caches | The constructor takes a name. | No name through the 10.x packages. Register a separate instance when a cache needs its own options. |
 | Memory limits | A megabyte limit, a percentage of physical memory, and memory polling. | `SizeLimit` in units the application defines. The runtime does not limit the cache based on memory pressure. |
 | Null values | Rejected. | Allowed. |
 | Absolute and sliding expiration on one entry | Throws an exception. | Allowed. The absolute expiration caps the sliding one. |
@@ -62,7 +62,7 @@ registers the cache as a singleton, so do not dispose an injected instance.
 | `System.Runtime.Caching` | `Microsoft.Extensions.Caching.Memory` | Migration notes |
 | --- | --- | --- |
 | `MemoryCache.Default` | Inject the singleton `IMemoryCache` registered by `AddMemoryCache` | There is no static default cache. |
-| `new MemoryCache("name")` | Register a separate service that owns a `Microsoft.Extensions.Caching.Memory.MemoryCache` | The new cache has no name. Use separate instances only when entries need different cache-wide options or lifetimes. |
+| `new MemoryCache("name")` | Register a separate service that owns a `Microsoft.Extensions.Caching.Memory.MemoryCache` | The 10.x and earlier packages give the cache no name. Use separate instances only when entries need different cache-wide options or lifetimes. |
 | `CacheItemPolicy` | `MemoryCacheEntryOptions` | Translate each policy property explicitly. The types are not interchangeable. |
 | `AbsoluteExpiration` | `AbsoluteExpiration` or `AbsoluteExpirationRelativeToNow` | A relative duration avoids calculating a timestamp at the call site. |
 | `SlidingExpiration` | `SlidingExpiration` | A sliding expiration does not extend an entry beyond an absolute expiration when both are set. |
