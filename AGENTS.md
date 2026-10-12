@@ -60,3 +60,9 @@ dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/test
 ```
 
 Report the commands and their results in the pull request description.
+
+## Manual QA
+
+To try the built package in a real project, follow
+[Manual QA](docs/qa.md). It installs the local package in sample projects
+and shows when `SRC1000` appears.
