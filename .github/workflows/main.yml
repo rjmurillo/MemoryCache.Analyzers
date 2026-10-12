@@ -13,6 +13,9 @@ on:
       - main
     
   workflow_call: # Allow to be called from the release workflow
+    secrets:
+      CODACY_PROJECT_TOKEN:
+        required: false # Coverage upload is skipped when it is not set
   schedule:
     - cron: '31 15 * * 0' # Run periodically to keep CodeQL database updated
 
