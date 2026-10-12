@@ -17,6 +17,7 @@ Read these files before making changes:
 - `CLAUDE.md`
 - `CONTRIBUTING.md`
 - `docs/rules/README.md`
+- `docs/architecture.md`
 - The implementation, tests, and rule page for the affected diagnostic
 
 Treat source code and tests as the authority for behavior. Verify documentation
