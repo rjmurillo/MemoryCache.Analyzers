@@ -10,6 +10,9 @@ from the repository root.
 
 ## Build and test
 
+Package versions are set only in `Directory.Packages.props` or
+`build/targets/*/Packages.props`, and per-project overrides fail restore.
+
 Restore dependencies:
 
 ```shell
