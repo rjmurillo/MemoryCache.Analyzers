@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace MemoryCache.Analyzers;
 
 /// <summary>
@@ -53,10 +55,8 @@ public sealed class SystemRuntimeCachingAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeObjectCreation(OperationAnalysisContext context, INamedTypeSymbol memoryCacheType)
     {
-        if (context.Operation is not IObjectCreationOperation creation)
-        {
-            return;
-        }
+        Debug.Assert(context.Operation is IObjectCreationOperation, "The action is registered only for OperationKind.ObjectCreation.");
+        IObjectCreationOperation creation = (IObjectCreationOperation)context.Operation;
 
         if (!ITypeSymbolExtensions.IsOrDerivedFrom(creation.Type, memoryCacheType))
         {
