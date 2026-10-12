@@ -61,8 +61,47 @@ dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/test
 
 Report the commands and their results in the pull request description.
 
+## Environment variables
+
+Local format, build, and test need no environment variables and no `.env`
+file. The project does not read a `.env` file. The variables below matter only
+in CI.
+
+| Name | Where | Required | Purpose |
+| --- | --- | --- | --- |
+| `CODACY_PROJECT_TOKEN` | [`main.yml`][env-main] | No | Coverage upload |
+| `NUGET_API_KEY` | [`release.yml`][env-release] | Set by CI | NuGet push |
+| `CI`, `GITHUB_ACTIONS` | [`CodeAnalysis.targets`][env-ca] | No | CI detection |
+
+- `CODACY_PROJECT_TOKEN` is an optional repository secret.
+  [`release.yml`][env-release] passes it to [`main.yml`][env-main].
+  CI uploads coverage to Codacy when it is set, and skips the upload when not.
+- `NUGET_API_KEY` is a temporary key from the NuGet OIDC login step.
+  Only the `publish` job in [`release.yml`][env-release] sets it.
+  Nobody sets it by hand.
+- GitHub Actions sets `CI` and `GITHUB_ACTIONS` to `true`. The
+  `DotNet.ReproducibleBuilds` package, added by
+  [`Reproducible.props`][env-repro], then sets `ContinuousIntegrationBuild`.
+  [`CodeAnalysis.targets`][env-ca] uses that to turn on `PedanticMode`, which
+  treats warnings as errors. If your shell sets `CI=true`, local builds do the
+  same.
+
+Never put secrets in the repository.
+
+[env-main]: .github/workflows/main.yml
+[env-release]: .github/workflows/release.yml
+[env-ca]: build/targets/codeanalysis/CodeAnalysis.targets
+[env-repro]: build/targets/reproducible/Reproducible.props
+
 ## Manual QA
 
 To try the built package in a real project, follow
 [Manual QA](docs/qa.md). It installs the local package in sample projects
 and shows when `SRC1000` appears.
+
+## Skills
+
+- [`.claude/skills/verify-change/SKILL.md`](.claude/skills/verify-change/SKILL.md):
+  run the format, build, and test checks and collect proof.
+- [`.claude/skills/add-analyzer-rule/SKILL.md`](.claude/skills/add-analyzer-rule/SKILL.md):
+  follow the checklist for adding or changing a diagnostic rule.
