@@ -1,0 +1,106 @@
+name: Release publish
+
+on:
+  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
+    inputs:
+      expected-version:
+        description: 'Package version to publish, without leading v (e.g. 0.1.0-alpha); must match the built .nupkg version'
+        required: true
+        type: string
+  push:
+    tags:
+      - 'v*.*.*' # Run the workflow when a version tag is pushed
+  release:
+    types:
+      - published # Run the workflow when a new GitHub release is published
+
+# A release made with a new tag fires both events. Run them one at a time.
+# The second run sees the package on NuGet and skips it.
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.expected-version || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  packages: read
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/main.yml
+    permissions:
+      security-events: write # main.yml requests this; a called workflow cannot exceed its caller
+      packages: read
+      contents: read
+      actions: read
+    secrets: inherit
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    permissions:
+      id-token: write # NuGet trusted publishing exchanges the GitHub OIDC token for a temporary API key
+      contents: read
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: packages
+          name: packages-ubuntu-24.04-arm
+      - name: Verify package version matches release tag
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event_name != 'workflow_dispatch' && github.ref_name || inputs.expected-version }}
+        run: |
+          $tag = $env:RELEASE_TAG -replace '^v', ''
+          $packages = @(Get-ChildItem ./packages/release -Recurse -Include *.nupkg -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '*.symbols.*' })
+          if ($packages.Count -eq 0) {
+            Write-Error "No .nupkg files found for version verification"
+            exit 1
+          }
+          foreach ($pkg in $packages) {
+            $stem = [System.IO.Path]::GetFileNameWithoutExtension($pkg.Name)
+            if ($stem -match '(\d+\.\d+\.\d+.*)$') {
+              $nupkgVersion = $Matches[1]
+            } else {
+              Write-Error "Could not parse version from package filename '$($pkg.Name)'"
+              exit 1
+            }
+            if ($nupkgVersion -ne $tag) {
+              Write-Error "Package version '$nupkgVersion' does not match release tag '$tag'"
+              exit 1
+            }
+          }
+          Write-Host "All packages match release tag v$tag"
+      # Trusted publishing: https://aka.ms/nuget/trusted-publishing
+      # The temporary key lasts one hour, so request it right before the push.
+      - name: NuGet login (OIDC to temporary API key)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: rjmurillo # nuget.org profile name that owns the package, not an email address
+      - name: Publish NuGet package
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          $files = @(Get-ChildItem ./packages/release -Recurse -Include *.nupkg -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike '*.symbols.*' })
+          if ($files.Count -eq 0) {
+            Write-Error "No .nupkg files found under ./packages/release"
+            exit 1
+          }
+          foreach ($file in $files) {
+            Write-Host "NuGet publish for file: '$file'"
+            $maxAttempts = 3
+            for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+              dotnet nuget push $file --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+              if ($LASTEXITCODE -eq 0) { break }
+              if ($attempt -eq $maxAttempts) {
+                Write-Error "NuGet push failed for '$file' after $maxAttempts attempts"
+                exit 1
+              }
+              Write-Warning "Attempt $attempt failed (exit code $LASTEXITCODE). Retrying in $($attempt * 5)s..."
+              Start-Sleep -Seconds ($attempt * 5)
+            }
+          }
