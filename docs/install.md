@@ -4,12 +4,13 @@ The current stable version of MemoryCache.Analyzers is `0.1.0`.
 
 ## Requirements
 
-- .NET SDK 8.0.100 or later for command line builds.
-- Visual Studio 2022 version 17.8 or later for editor diagnostics.
+- .NET 10 SDK (10.0.100 or later) for command line builds.
+- Visual Studio 2026 or later for editor diagnostics.
 - An SDK-style C# project.
 
-The analyzer targets .NET Standard 2.0 and uses Roslyn 4.8. The .NET 8.0.100 SDK and Visual Studio 2022 version
-17.8 include Roslyn 4.8.
+The analyzer targets .NET Standard 2.0 and uses Roslyn 5.0. The .NET 10.0.100
+SDK and Visual Studio 2026 include Roslyn 5.0. Older SDKs and Visual Studio
+versions do not load the analyzer.
 
 ## Install in one project
 
