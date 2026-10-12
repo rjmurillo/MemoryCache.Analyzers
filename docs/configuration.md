@@ -95,7 +95,7 @@ For example, a project targeting both .NET Framework 4.6.2 and .NET 8 reports SR
 </PropertyGroup>
 
 <ItemGroup>
-  <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0-alpha" PrivateAssets="all" />
+  <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0" PrivateAssets="all" />
   <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
 </ItemGroup>
 ```

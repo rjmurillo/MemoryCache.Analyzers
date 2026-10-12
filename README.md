@@ -32,17 +32,17 @@ cache.Set("order:42", "ready", TimeSpan.FromMinutes(5));
 
 ## Install
 
-The published package is a prerelease. Install it in each project to analyze:
+Install the package in each project to analyze:
 
 ```shell
-dotnet add package MemoryCache.Analyzers --prerelease
+dotnet add package MemoryCache.Analyzers
 ```
 
 Or add a package reference:
 
 ```xml
 <PackageReference Include="MemoryCache.Analyzers"
-                  Version="0.1.0-alpha"
+                  Version="0.1.0"
                   PrivateAssets="all" />
 ```
 
