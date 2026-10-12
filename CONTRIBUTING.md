@@ -27,6 +27,19 @@ The hooks do the following:
 
 Task definitions live in [`.husky/task-runner.json`](.husky/task-runner.json).
 
+### Dev container
+
+You can skip the manual setup and use the dev container instead. Open the
+repository in VS Code, GitHub Codespaces, or the devcontainer CLI. The
+container installs the .NET SDK, PowerShell, and GitHub CLI. It also restores
+NuGet packages and local .NET tools when it is created.
+
+Start the container with the devcontainer CLI:
+
+```shell
+npx --yes @devcontainers/cli up --workspace-folder .
+```
+
 ## Build and test
 
 Package versions are set only in `Directory.Packages.props` or
