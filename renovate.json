@@ -63,13 +63,15 @@
           "System.Formats.Asn1"
         ],
         "automerge": false,
-        "addLabels": ["analyzer-compat"]
+        "addLabels": ["analyzer-compat"],
+        "minimumReleaseAge": "14 days"
       },
       {
         "description": "BenchmarkDotNet pins exact versions of its own dependencies. Review updates by hand and rerun the benchmarks.",
         "matchPackageNames": ["BenchmarkDotNet"],
         "automerge": false,
-        "addLabels": ["benchmark-tooling"]
+        "addLabels": ["benchmark-tooling"],
+        "minimumReleaseAge": "14 days"
       }
     ],
     "platformAutomerge": true
