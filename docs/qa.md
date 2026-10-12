@@ -265,3 +265,24 @@ Remove-Item Env:NUGET_PACKAGES
 
 These results match the rule. See [SRC1000](rules/SRC1000.md) for when the
 rule reports and how to configure it.
+
+## Automated smoke test
+
+A script runs the .NET 10 and .NET Framework cases for you. It needs
+PowerShell 7 or later. Build the solution first, then run the script from
+the repository root:
+
+```shell
+dotnet build MemoryCache.Analyzers.sln
+pwsh ./build/scripts/Invoke-PackageSmokeTest.ps1
+```
+
+The script reads the package from `artifacts/package/debug/`. For a Release
+build, add `-Configuration Release`. The folder must hold exactly one
+package, so delete old packages first.
+
+The script creates the sample projects in a temporary folder and uses its
+own NuGet cache. It prints a `PASS` or `FAIL` line for each case and
+deletes the folder when it ends. A failed case makes the script fail.
+
+CI runs the script after the tests on Windows and Linux.
