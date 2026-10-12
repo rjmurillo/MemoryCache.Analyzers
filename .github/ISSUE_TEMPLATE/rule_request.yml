@@ -1,0 +1,30 @@
+name: Rule or feature request
+description: Suggest a new rule or a change to an existing rule.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What risky caching code should be flagged, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: bad-code
+    attributes:
+      label: Code that should be reported
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: good-code
+    attributes:
+      label: Code that should not be reported
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Links to docs or issues that support this
+    validations:
+      required: false
