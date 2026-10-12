@@ -66,3 +66,10 @@ Report the commands and their results in the pull request description.
 To try the built package in a real project, follow
 [Manual QA](docs/qa.md). It installs the local package in sample projects
 and shows when `SRC1000` appears.
+
+## Skills
+
+- [`.claude/skills/verify-change/SKILL.md`](.claude/skills/verify-change/SKILL.md):
+  run the format, build, and test checks and collect proof.
+- [`.claude/skills/add-analyzer-rule/SKILL.md`](.claude/skills/add-analyzer-rule/SKILL.md):
+  follow the checklist for adding or changing a diagnostic rule.
