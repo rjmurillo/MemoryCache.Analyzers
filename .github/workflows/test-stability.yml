@@ -1,0 +1,70 @@
+name: Test stability
+
+on:
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'How many times to run the test suite'
+        required: false
+        default: '5'
+
+permissions:
+  contents: read
+
+jobs:
+  stability:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0 # nbgv needs full history
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          global-json-file: ./global.json
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Run tests repeatedly
+        shell: pwsh
+        env:
+          ITERATIONS: ${{ inputs.iterations || '5' }}
+        run: |
+          $iterations = [int]$env:ITERATIONS
+          $failures = @{}
+          $failedRuns = 0
+          for ($i = 1; $i -le $iterations; $i++) {
+            $dir = "./artifacts/stability/run-$i"
+            dotnet test --no-build --configuration Release --results-directory $dir --logger "trx;LogFileName=run-$i.trx"
+            if ($LASTEXITCODE -ne 0) { $failedRuns++ }
+            foreach ($trx in Get-ChildItem $dir -Recurse -Filter *.trx) {
+              [xml]$xml = Get-Content $trx.FullName
+              foreach ($result in $xml.TestRun.Results.UnitTestResult) {
+                if ($result.outcome -eq 'Failed') {
+                  $failures[$result.testName] = 1 + ($failures[$result.testName] ?? 0)
+                }
+              }
+            }
+          }
+          "## Test stability ($iterations runs)" | Add-Content $env:GITHUB_STEP_SUMMARY
+          "" | Add-Content $env:GITHUB_STEP_SUMMARY
+          "Failed runs: $failedRuns of $iterations" | Add-Content $env:GITHUB_STEP_SUMMARY
+          if ($failures.Count -gt 0) {
+            "" | Add-Content $env:GITHUB_STEP_SUMMARY
+            "| Test | Failures |" | Add-Content $env:GITHUB_STEP_SUMMARY
+            "| --- | ---: |" | Add-Content $env:GITHUB_STEP_SUMMARY
+            foreach ($name in $failures.Keys) {
+              "| $name | $($failures[$name]) of $iterations |" | Add-Content $env:GITHUB_STEP_SUMMARY
+            }
+            exit 1
+          }
+      - name: Upload test results
+        if: success() || failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-stability-results
+          path: ./artifacts/stability

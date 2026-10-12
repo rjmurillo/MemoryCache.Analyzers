@@ -47,6 +47,14 @@ jobs:
       with:
         global-json-file: ./global.json
 
+    - name: Cache NuGet packages
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('global.json', 'Directory.Packages.props', 'build/targets/**/Packages.props', '.config/dotnet-tools.json') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-${{ runner.arch }}-
+
     - name: NuGet Restore
       run: dotnet restore
 
@@ -112,3 +120,40 @@ jobs:
         path: |
           ./artifacts/package
         if-no-files-found: error
+
+    - name: Publish step timings
+      if: success() || failure()
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ github.token }}
+        MATRIX_OS: ${{ matrix.os }}
+      run: |
+        $uri = "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID/attempts/$env:GITHUB_RUN_ATTEMPT/jobs?per_page=100"
+        $jobs = (gh api $uri | ConvertFrom-Json).jobs
+        $job = $jobs | Where-Object { $_.name -like "*build ($env:MATRIX_OS)" } | Select-Object -First 1
+        if ($null -eq $job) {
+          Write-Error "Could not find the job for $env:MATRIX_OS"
+          exit 1
+        }
+        $rows = foreach ($step in $job.steps) {
+          if ($null -ne $step.completed_at -and $null -ne $step.started_at) {
+            $seconds = [int]([datetime]$step.completed_at - [datetime]$step.started_at).TotalSeconds
+            [pscustomobject]@{ name = $step.name; seconds = $seconds; conclusion = $step.conclusion }
+          }
+        }
+        New-Item -ItemType Directory -Force -Path ./artifacts/timings | Out-Null
+        $rows | ConvertTo-Json | Set-Content -Path "./artifacts/timings/step-timings-$env:MATRIX_OS.json"
+        "## Step timings ($env:MATRIX_OS)" | Add-Content $env:GITHUB_STEP_SUMMARY
+        "" | Add-Content $env:GITHUB_STEP_SUMMARY
+        "| Step | Seconds | Result |" | Add-Content $env:GITHUB_STEP_SUMMARY
+        "| --- | ---: | --- |" | Add-Content $env:GITHUB_STEP_SUMMARY
+        foreach ($row in $rows) {
+          "| $($row.name) | $($row.seconds) | $($row.conclusion) |" | Add-Content $env:GITHUB_STEP_SUMMARY
+        }
+
+    - name: Upload step timings
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      if: success() || failure()
+      with:
+        name: step-timings-${{ matrix.os }}
+        path: ./artifacts/timings
