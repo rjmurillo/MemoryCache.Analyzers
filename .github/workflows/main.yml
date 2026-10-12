@@ -69,7 +69,7 @@ jobs:
       run: ./build/scripts/Invoke-PackageSmokeTest.ps1 -Configuration Release
 
     - name: Upload binlogs
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: success() || failure()
       with:
         name: binlogs-${{ matrix.os }}
@@ -77,7 +77,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload *.received.* files
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: failure()
       with:
         name: verify-test-results
@@ -85,14 +85,14 @@ jobs:
           **/*.received.*
 
     - name: Upload SARIF files
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: success() || failure()
       with:
         name: SARIF files (${{ matrix.os }})
         path: ./artifacts/obj/**/*.sarif
 
     - name: Upload Test Report
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: success() || failure()
       with:
         name: .NET Test Reports (${{ matrix.os }})
@@ -100,7 +100,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Code Coverage Report
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: success() || failure()
       with:
         name: .NET Code Coverage Reports (${{ matrix.os }})
@@ -118,7 +118,7 @@ jobs:
         coverage-reports: ${{ github.workspace }}/artifacts/TestResults/coverage/Cobertura.xml
 
     - name: Upload packages
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: packages-${{ matrix.os }}
         path: |
@@ -156,7 +156,7 @@ jobs:
         }
 
     - name: Upload step timings
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: success() || failure()
       with:
         name: step-timings-${{ matrix.os }}
