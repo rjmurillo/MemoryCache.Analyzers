@@ -87,6 +87,7 @@ dotnet_diagnostic.SRC1000.severity = error
 - [GetOrCreate is not atomic: cache stampede in IMemoryCache](docs/getorcreate-stampede.md)
 - [Manual QA: try the local package in a sample project](docs/qa.md)
 - [Architecture: analyzer flow and build and release flow](docs/architecture.md)
+- [Runbooks: releases, bad releases, and CI failures](docs/runbooks/README.md)
 
 ## Build and test
 
