@@ -20,9 +20,12 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-24.04-arm
+    # Gate on the PR author and a same-repo head branch, not github.actor.
+    # github.actor is whoever fired the event, which a fork PR can influence.
     if: >-
       github.event.action != 'labeled' &&
-      (github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]')
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Fetch metadata
         id: dependabot-metadata
@@ -52,7 +55,9 @@ jobs:
     permissions:
       pull-requests: write
     runs-on: ubuntu-24.04-arm
-    if: github.actor == 'renovate[bot]'
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     # Renovate adds several labels in one call, and each one fires a labeled
     # event. Keep only the newest run per PR to avoid duplicate approvals.
     concurrency:

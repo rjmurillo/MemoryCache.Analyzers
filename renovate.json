@@ -54,7 +54,7 @@
           "Microsoft.CodeAnalysis.BannedApiAnalyzers"
         ],
         "allowedVersions": "5.0.x",
-        "minimumReleaseAge": "3 days"
+        "minimumReleaseAge": "14 days"
       },
       {
         "description": "AnalyzerUtilities is bundled in the shipped analyzer, and System.Formats.Asn1 is a transitive pin for it. Both run inside the consumer's compiler host, so every update needs manual review.",
