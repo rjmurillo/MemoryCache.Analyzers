@@ -38,12 +38,12 @@ jobs:
       IS_COVERAGE_ALLOWED: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         global-json-file: ./global.json
 
@@ -57,7 +57,7 @@ jobs:
       run: dotnet test --no-build --configuration Release --settings ./build/targets/tests/test.runsettings
 
     - name: Upload binlogs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: success() || failure()
       with:
         name: binlogs-${{ matrix.os }}
@@ -65,7 +65,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload *.received.* files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: failure()
       with:
         name: verify-test-results
@@ -73,14 +73,14 @@ jobs:
           **/*.received.*
 
     - name: Upload SARIF files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: success() || failure()
       with:
         name: SARIF files (${{ matrix.os }})
         path: ./artifacts/obj/**/*.sarif
 
     - name: Upload Test Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: success() || failure()
       with:
         name: .NET Test Reports (${{ matrix.os }})
@@ -88,7 +88,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload Code Coverage Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: success() || failure()
       with:
         name: .NET Code Coverage Reports (${{ matrix.os }})
@@ -100,13 +100,13 @@ jobs:
 
     - name: Upload coverage data to Codacy      
       if: ${{ runner.os == 'Linux' && env.IS_COVERAGE_ALLOWED == 'true' }}
-      uses: codacy/codacy-coverage-reporter-action@v1.3.0
+      uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: ${{ github.workspace }}/artifacts/TestResults/coverage/Cobertura.xml
 
     - name: Upload packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: packages-${{ matrix.os }}
         path: |

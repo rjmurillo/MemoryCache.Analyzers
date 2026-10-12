@@ -17,8 +17,7 @@
                   TODO: Consider using a "Just my code"-esque tool to automatically include all project references.
                   Discuss in https://github.com/microsoft/codecoverage.
                 -->
-                <ModulePath>.*System\.Runtime\.Caching\.Analyzers\.dll$</ModulePath>
-                <ModulePath>.*System\.Runtime\.Caching\.CodeFixes\.dll$</ModulePath>
+                <ModulePath>.*MemoryCache\.Analyzers\.dll$</ModulePath>
               </Include>
               <Exclude>
                 <ModulePath>.*\.TestAdapter\.dll$</ModulePath> <!-- Excludes test adapters -->
