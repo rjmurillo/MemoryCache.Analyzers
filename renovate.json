@@ -4,6 +4,8 @@
       "config:recommended",
       "helpers:pinGitHubActionDigests"
     ],
+    "labels": ["dependencies"],
+    "dependencyDashboardLabels": ["dependencies"],
     "minimumReleaseAge": "3 days",
     "internalChecksFilter": "strict",
     "packageRules": [
