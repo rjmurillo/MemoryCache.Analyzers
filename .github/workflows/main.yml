@@ -64,6 +64,10 @@ jobs:
     - name: Test
       run: dotnet test --no-build --configuration Release --settings ./build/targets/tests/test.runsettings
 
+    - name: Package smoke test
+      shell: pwsh
+      run: ./build/scripts/Invoke-PackageSmokeTest.ps1 -Configuration Release
+
     - name: Upload binlogs
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: success() || failure()

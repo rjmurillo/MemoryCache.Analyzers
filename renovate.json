@@ -16,6 +16,17 @@
         "automerge": true
       },
       {
+        "description": "Keep the Roslyn compile surface on the .NET 10 floor. Roslyn 5.0 ships in the .NET 10.0.100 SDK and Visual Studio 2026 18.0. Later 5.x releases map to later SDK bands, and an analyzer only loads in a compiler at least as new as the Roslyn it references.",
+        "matchPackageNames": [
+          "Microsoft.CodeAnalysis.CSharp",
+          "Microsoft.CodeAnalysis.CSharp.Workspaces",
+          "Microsoft.CodeAnalysis.AnalyzerUtilities",
+          "Microsoft.CodeAnalysis.BannedApiAnalyzers"
+        ],
+        "allowedVersions": "5.0.x",
+        "minimumReleaseAge": "3 days"
+      },
+      {
         "description": "Automerge lock file maintenance",
         "matchUpdateTypes": ["lockFileMaintenance"],
         "automerge": true

@@ -68,6 +68,13 @@ dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/test
 
 Report the commands and their results in the pull request description.
 
+For changes that affect packaging, also run the optional package smoke test.
+It installs the built package in sample projects and checks `SRC1000`:
+
+```shell
+pwsh ./build/scripts/Invoke-PackageSmokeTest.ps1
+```
+
 ## Environment variables
 
 Local format, build, and test need no environment variables and no `.env`
