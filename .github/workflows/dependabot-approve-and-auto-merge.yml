@@ -77,15 +77,19 @@ jobs:
     permissions:
       pull-requests: write
     runs-on: ubuntu-24.04-arm
+    # Renovate adds several labels in one call, and each one fires a labeled
+    # event. Run only for the renovate label so the other labels do not start
+    # runs. A cancelled run shows as a failed check on the PR.
     if: >-
+      (github.event.action != 'labeled' || github.event.label.name == 'renovate') &&
       github.actor == 'renovate[bot]' &&
       github.event.pull_request.user.login == 'renovate[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository
-    # Renovate adds several labels in one call, and each one fires a labeled
-    # event. Keep only the newest run per PR to avoid duplicate approvals.
+    # Run one job at a time per PR. Queue instead of cancel, so no run ends
+    # as cancelled.
     concurrency:
       group: renovate-approve-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       # Renovate handles auto-merge through platformAutomerge and the
       # per-package automerge rules in renovate.json. This job only approves
@@ -132,9 +136,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
 
+      # Runs are queued, not cancelled, so a later run can find the PR already
+      # approved. Skip it then to avoid a duplicate approval. A push dismisses
+      # the old approval, so a new commit still gets approved.
       - name: Approve PR
         if: steps.labels.outputs.approve == 'true'
-        run: gh pr review --approve "$PR_URL"
+        run: |
+          state="$(gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]") | .state' | tail -n 1)"
+          if [ "$state" = "APPROVED" ]; then
+            echo "Already approved. Skipping."
+            exit 0
+          fi
+          gh pr review --approve "$PR_URL"
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_URL: ${{ github.event.pull_request.html_url }}
