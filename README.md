@@ -86,6 +86,7 @@ dotnet_diagnostic.SRC1000.severity = error
 - [Migrate from System.Runtime.Caching.MemoryCache](docs/migrating-from-system-runtime-caching.md)
 - [GetOrCreate is not atomic: cache stampede in IMemoryCache](docs/getorcreate-stampede.md)
 - [Manual QA: try the local package in a sample project](docs/qa.md)
+- [Architecture: analyzer flow and build and release flow](docs/architecture.md)
 
 ## Build and test
 

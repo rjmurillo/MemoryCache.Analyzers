@@ -8,6 +8,10 @@ Thank you for contributing. By participating, you agree to follow the
 Install the .NET SDK selected by [`global.json`](global.json). Run all commands
 from the repository root.
 
+Local builds and tests need no environment variables and no `.env` file. For
+the variables CI uses, see
+[Environment variables](AGENTS.md#environment-variables) in `AGENTS.md`.
+
 ### Git hooks
 
 The repository uses [Husky.Net](https://alirezanet.github.io/Husky.Net/) to run
@@ -50,11 +54,26 @@ Build with warnings treated as errors:
 dotnet build MemoryCache.Analyzers.sln --no-restore /p:PedanticMode=true
 ```
 
+The build reports unused references as `RT0001`-`RT0003` warnings.
+
 Run the full test suite with the repository settings:
 
 ```shell
 dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/tests/test.runsettings
 ```
+
+## Benchmarks
+
+The `tests/MemoryCache.Analyzers.Benchmarks` project measures analyzer time and
+memory with BenchmarkDotNet. CI builds it but does not run it. Run all
+benchmarks in Release mode:
+
+```shell
+dotnet run -c Release --project tests/MemoryCache.Analyzers.Benchmarks -- --filter="*"
+```
+
+BenchmarkDotNet writes reports to `BenchmarkDotNet.Artifacts/results/`. Paste
+the `*-report-github.md` table into your pull request when you run benchmarks.
 
 ## Add or change a rule
 
@@ -132,6 +151,16 @@ The table lists the labels added for this system and their meaning.
 | `area: build` | MSBuild files in `build/` and `Directory.*`. |
 | `area: ci` | GitHub Actions in `.github/workflows`. |
 | `area: release` | Versioning, packaging, and NuGet publishing. |
+
+## Flaky tests
+
+A flaky test passes in some runs and fails in others with no code change.
+
+- The "Test stability" workflow runs every week. You can also start it by hand
+  from the Actions tab. It builds once, runs the test suite several times, and
+  lists any test that failed in some runs.
+- If it reports a test, open a bug with the labels `bug` and `area: tests`.
+  Then fix the cause. Do not add retries. Retries hide flaky tests.
 
 ## Pull requests
 
