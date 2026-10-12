@@ -7,8 +7,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <!-- Properties for analyzer projects to resolve RS1036 -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'MemoryCache.Analyzers' or '$(MSBuildProjectName)' == 'MemoryCache.Analyzers.Tests'">
+  <!-- Properties for the analyzer project to resolve RS1036 -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'MemoryCache.Analyzers'">
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
@@ -48,8 +48,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ExhaustiveMatching.Analyzer" />
     <PackageReference Include="EffectiveCSharp.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReferenceTrimmer">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
