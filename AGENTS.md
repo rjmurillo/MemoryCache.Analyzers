@@ -119,3 +119,8 @@ and shows when `SRC1000` appears.
   run the format, build, and test checks and collect proof.
 - [`.claude/skills/add-analyzer-rule/SKILL.md`](.claude/skills/add-analyzer-rule/SKILL.md):
   follow the checklist for adding or changing a diagnostic rule.
+
+## Runbooks
+
+For releases, bad releases, and CI failures, follow the
+[runbooks](docs/runbooks/README.md).
