@@ -1,0 +1,65 @@
+name: Bug report
+description: Report a false positive, false negative, crash, or wrong message.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of problem
+      options:
+        - False positive (warning on correct code)
+        - False negative (no warning on wrong code)
+        - Analyzer crash or AD0001
+        - Wrong message or help link
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: rule-id
+    attributes:
+      label: Rule ID, for example SRC1000
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: MemoryCache.Analyzers version
+    validations:
+      required: true
+  - type: input
+    id: sdk-version
+    attributes:
+      label: Output of `dotnet --version`
+    validations:
+      required: true
+  - type: input
+    id: target-frameworks
+    attributes:
+      label: Target framework(s), for example net8.0;net48
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Smallest code that shows the problem
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened. Include the full diagnostic or error.
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: Visual Studio, Rider, VS Code, or `dotnet build`
+    validations:
+      required: false

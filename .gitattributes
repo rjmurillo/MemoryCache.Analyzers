@@ -15,6 +15,9 @@
 *.csx    text diff=csharp
 *.sln    text eol=crlf
 
+# Git hooks must use LF line endings to run on Linux and macOS
+.husky/* text eol=lf
+
 # Content below from: https://github.com/gitattributes/gitattributes/blob/master/Common.gitattributes
 
 # Documents

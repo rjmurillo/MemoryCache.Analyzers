@@ -1,0 +1,24 @@
+{
+  "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+  "tasks": [
+    {
+      "name": "format-check-staged",
+      "group": "pre-commit",
+      "command": "dotnet",
+      "args": ["format", "MemoryCache.Analyzers.sln", "--verify-no-changes", "--include", "${staged}"],
+      "include": ["**/*.cs"]
+    },
+    {
+      "name": "build-pedantic",
+      "group": "pre-push",
+      "command": "dotnet",
+      "args": ["build", "MemoryCache.Analyzers.sln", "/p:PedanticMode=true"]
+    },
+    {
+      "name": "test",
+      "group": "pre-push",
+      "command": "dotnet",
+      "args": ["test", "MemoryCache.Analyzers.sln", "--no-build", "--settings", "./build/targets/tests/test.runsettings"]
+    }
+  ]
+}
