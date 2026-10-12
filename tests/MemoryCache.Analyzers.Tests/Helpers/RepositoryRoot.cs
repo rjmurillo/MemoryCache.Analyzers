@@ -31,16 +31,16 @@ public static class RepositoryRoot
     /// <exception cref="InvalidOperationException">The search reached the file system root.</exception>
     public static string Find(string start, string solutionFileName)
     {
-        DirectoryInfo? directory = new(start);
+        string? directory = Path.GetFullPath(start);
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, solutionFileName)))
+            if (File.Exists(Path.Combine(directory, solutionFileName)))
             {
-                return directory.FullName;
+                return directory;
             }
 
-            directory = directory.Parent;
+            directory = Path.GetDirectoryName(directory);
         }
 
         throw new InvalidOperationException($"Could not find {solutionFileName} above {start}.");

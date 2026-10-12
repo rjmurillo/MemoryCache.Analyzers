@@ -22,7 +22,7 @@ public sealed class RepositoryRootTests
     [Fact]
     public void FindThrowsWhenNoFolderContainsTheSolution()
     {
-        string missingSolution = "MissingSolution.sln";
+        const string missingSolution = "MissingSolution.sln";
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => RepositoryRoot.Find(AppContext.BaseDirectory, missingSolution));

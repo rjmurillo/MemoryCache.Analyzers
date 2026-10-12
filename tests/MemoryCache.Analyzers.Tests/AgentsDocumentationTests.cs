@@ -9,6 +9,8 @@ namespace MemoryCache.Analyzers.Tests;
 /// </summary>
 public sealed partial class AgentsDocumentationTests
 {
+    private static readonly string CurrentFolderPrefix = "./";
+
     /// <summary>
     /// Checks that every file or folder named in inline code in <c>AGENTS.md</c>
     /// exists. A span with a <c>/</c> is relative to the repository root. A bare
@@ -72,7 +74,7 @@ public sealed partial class AgentsDocumentationTests
     [Fact]
     public void ExtractDotnetCommandsReadsOnlyCodeBlocks()
     {
-        string markdown = "dotnet outside\r\n```shell\r\n  dotnet build x.sln  \r\ngit status\r\n```\r\ndotnet after";
+        const string markdown = "dotnet outside\r\n```shell\r\n  dotnet build x.sln  \r\ngit status\r\n```\r\ndotnet after";
 
         Assert.Equal(["dotnet build x.sln"], ExtractDotnetCommands(markdown));
     }
@@ -117,17 +119,43 @@ public sealed partial class AgentsDocumentationTests
             string span = match.Groups["path"].Value;
             if (IsPath(span))
             {
-                paths.Add(span.StartsWith("./", StringComparison.Ordinal) ? span[2..] : span);
+                paths.Add(TrimCurrentFolderPrefix(span));
             }
         }
 
         return paths;
     }
 
+    private static string TrimCurrentFolderPrefix(string span)
+    {
+        return span.StartsWith(CurrentFolderPrefix, StringComparison.Ordinal)
+            ? span[CurrentFolderPrefix.Length..]
+            : span;
+    }
+
     private static bool IsPath(string span)
     {
-        return span.Contains('/', StringComparison.Ordinal)
-            || Path.GetExtension(span) is ".md" or ".json" or ".props" or ".targets" or ".sln" or ".csproj" or ".cs" or ".runsettings";
+        return span.Contains('/', StringComparison.Ordinal) || HasPathExtension(Path.GetExtension(span));
+    }
+
+    private static bool HasPathExtension(string extension)
+    {
+        return IsDocumentExtension(extension) || IsProjectExtension(extension) || IsBuildExtension(extension);
+    }
+
+    private static bool IsDocumentExtension(string extension)
+    {
+        return extension is ".md" or ".json";
+    }
+
+    private static bool IsProjectExtension(string extension)
+    {
+        return extension is ".sln" or ".csproj" or ".cs";
+    }
+
+    private static bool IsBuildExtension(string extension)
+    {
+        return extension is ".props" or ".targets" or ".runsettings";
     }
 
     private static List<string> ExtractDotnetCommands(string markdown)
@@ -186,9 +214,20 @@ public sealed partial class AgentsDocumentationTests
 
     private static bool IsSkippedFolder(string name)
     {
-        return name is ".git" or "artifacts" or "bin" or "obj" or "node_modules";
+        return IsToolFolder(name) || IsBuildOutputFolder(name);
     }
 
+    private static bool IsToolFolder(string name)
+    {
+        return name is ".git" or "node_modules";
+    }
+
+    private static bool IsBuildOutputFolder(string name)
+    {
+        return name is "artifacts" or "bin" or "obj";
+    }
+
+    // GeneratedRegex needs a partial method, so the class is partial.
     [GeneratedRegex(@"`(?<path>[^`\s]+)`", RegexOptions.ExplicitCapture, matchTimeoutMilliseconds: 1000)]
     private static partial Regex InlineCodePattern();
 }
