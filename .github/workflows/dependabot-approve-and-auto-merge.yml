@@ -29,13 +29,18 @@ jobs:
       github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      # Fail closed if anyone but the bot authored a commit on this branch.
-      - name: Check commit authors
+      # Fail closed unless every commit is authored by the bot, committed by
+      # GitHub (web-flow), and carries a GitHub-verified signature. The author
+      # login alone comes from the commit email, which anyone can set. This
+      # does not stop a user with write access, who can already merge because
+      # the ruleset requires no approvals.
+      - name: Check commit provenance
         run: |
-          authors="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].author.login // "unknown"' | sort -u)"
-          echo "Commit authors: $(paste -sd, <<< "$authors")"
-          if [ "$authors" != "$BOT" ]; then
-            echo "::error::Commits from someone other than $BOT. Not approving."
+          commits="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' | sort -u)"
+          echo "Commits (author committer verified): $(paste -sd, <<< "$commits")"
+          if [ "$commits" != "$BOT web-flow true" ]; then
+            echo "::error::A commit is not a GitHub-signed commit by $BOT. Not approving."
             exit 1
           fi
         env:
@@ -92,13 +97,18 @@ jobs:
       # and fails closed: it approves only when the renovate label is present
       # and major-update is absent. The labeled trigger re-runs the check once
       # Renovate adds its labels.
-      # Fail closed if anyone but the bot authored a commit on this branch.
-      - name: Check commit authors
+      # Fail closed unless every commit is authored by the bot, committed by
+      # GitHub (web-flow), and carries a GitHub-verified signature. The author
+      # login alone comes from the commit email, which anyone can set. This
+      # does not stop a user with write access, who can already merge because
+      # the ruleset requires no approvals.
+      - name: Check commit provenance
         run: |
-          authors="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].author.login // "unknown"' | sort -u)"
-          echo "Commit authors: $(paste -sd, <<< "$authors")"
-          if [ "$authors" != "$BOT" ]; then
-            echo "::error::Commits from someone other than $BOT. Not approving."
+          commits="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' | sort -u)"
+          echo "Commits (author committer verified): $(paste -sd, <<< "$commits")"
+          if [ "$commits" != "$BOT web-flow true" ]; then
+            echo "::error::A commit is not a GitHub-signed commit by $BOT. Not approving."
             exit 1
           fi
         env:
