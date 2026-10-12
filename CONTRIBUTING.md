@@ -51,6 +51,24 @@ Keep diagnostic metadata, implementation, tests, release tracking, and
 documentation consistent. Do not claim that a code fix exists unless the
 repository contains and tests one.
 
+## Test naming
+
+Follow these rules for tests under `tests/MemoryCache.Analyzers.Tests`:
+
+1. Test class names end in `Tests` and mirror the type under test. For
+   example, `SystemRuntimeCachingAnalyzerTests` tests
+   `SystemRuntimeCachingAnalyzer`.
+2. Test file names match the class name. For example,
+   `SystemRuntimeCachingAnalyzerTests` lives in
+   `SystemRuntimeCachingAnalyzerTests.cs`.
+3. Test method names are PascalCase sentences that describe behavior. They
+   contain no underscores. For example, use
+   `FlagsMemoryCacheUsageInNetCoreProject`, not
+   `Flags_MemoryCache_Usage`.
+
+`TestConventionTests` checks rules 1 and 3. It fails and lists each test
+class or method that breaks them.
+
 ## Rule page expectations
 
 Name each rule page after its diagnostic ID, for example
