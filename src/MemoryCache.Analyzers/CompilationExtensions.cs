@@ -1,7 +1,13 @@
-﻿namespace MemoryCache.Analyzers;
+﻿using System.Diagnostics;
+
+namespace MemoryCache.Analyzers;
 
 internal static class CompilationExtensions
 {
+    // .NET Framework 4.x ships mscorlib as version 4.0.0.0. An mscorlib with this
+    // major version or higher is treated as .NET Core era, not .NET Framework.
+    private static readonly int FirstNetCoreMscorlibMajorVersion = 5;
+
     /// <summary>
     /// Determines whether the provided compilation is targeting the classic .NET Framework.
     /// </summary>
@@ -14,11 +20,7 @@ internal static class CompilationExtensions
     public static bool? IsTargetingNetFramework(this Compilation compilation)
     {
         INamedTypeSymbol objectType = compilation.GetSpecialType(SpecialType.System_Object);
-        IAssemblySymbol? coreAssembly = objectType.ContainingAssembly;
-        if (coreAssembly is null)
-        {
-            return null;
-        }
+        IAssemblySymbol coreAssembly = objectType.ContainingAssembly;
 
         AssemblyIdentity identity = coreAssembly.Identity;
 
@@ -32,13 +34,14 @@ internal static class CompilationExtensions
         if (string.Equals(identity.Name, "mscorlib", StringComparison.Ordinal))
         {
             // Heuristic: check for .NET Core mscorlib (should not happen, but possible in test harnesses)
-            string? moduleName = coreAssembly.Locations.FirstOrDefault()?.MetadataModule?.Name;
+            Debug.Assert(!coreAssembly.Locations.IsEmpty, "An assembly that defines System.Object always has a location.");
+            string? moduleName = coreAssembly.Locations[0].MetadataModule?.Name;
             if (!string.IsNullOrEmpty(moduleName) && moduleName.Contains("Microsoft.NETCore.App", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
 
-            if (identity.Version != null && identity.Version.Major >= 5)
+            if (identity.Version.Major >= FirstNetCoreMscorlibMajorVersion)
             {
                 return false;
             }
