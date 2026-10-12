@@ -9,9 +9,24 @@ the failed run in the **Actions** tab and find the failed step.
 The `Verify package version matches release tag` step fails with
 `Package version '...' does not match release tag '...'`.
 
+First, check the two versions in the message.
+
+### Mistyped `expected-version` in a manual run
+
+A manual run compares the package with the `expected-version` input, not the
+tag. If the package version matches the tag, only the input was wrong. Start a
+new manual run on the same tag with the correct input:
+
+```shell
+gh workflow run release.yml --ref vX.Y.Z -f expected-version=X.Y.Z
+```
+
+Do not re-run the failed job. A re-run keeps the old input.
+
+### Package version does not match the tag
+
 The version in [`version.json`](../../version.json) at the tagged commit is
-not the version in the tag. For a manual run, the `expected-version` input
-must also match the package version.
+not the version in the tag.
 
 1. Do not move or re-push the existing tag.
 2. Open a pull request that sets `version.json` to the next unused version.

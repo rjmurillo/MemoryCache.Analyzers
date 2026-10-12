@@ -32,24 +32,35 @@ Wait for every required check to pass. Then merge the pull request into
 
 ## 3. Tag and create the release
 
-Pull the merge commit and tag it:
+Pushing the tag starts the `Release publish` workflow, so check the tag
+target first. Tag the merge commit of the release pull request by its SHA.
+Replace `<PR>` with the pull request number:
 
 ```shell
-git switch main
-git pull
-git tag vX.Y.Z
+git fetch origin
+sha=$(gh pr view <PR> --json mergeCommit --jq .mergeCommit.oid)
+git tag vX.Y.Z "$sha"
+git rev-parse "vX.Y.Z^{commit}"
+git show vX.Y.Z:version.json
+```
+
+Check that `git rev-parse` prints the same SHA. Check that `version.json`
+shows `X.Y.Z`. If either is wrong, delete the local tag with
+`git tag -d vX.Y.Z` and start again. Then push the tag:
+
+```shell
 git push origin vX.Y.Z
 ```
 
-Pushing the tag starts the `Release publish` workflow. Next, create the
-GitHub release with notes generated from pull request labels:
+Next, create the GitHub release with notes generated from pull request
+labels:
 
 ```shell
 gh release create vX.Y.Z --generate-notes --verify-tag
 ```
 
-`--verify-tag` stops the command if the tag is not on GitHub yet. That
-prevents a release on the wrong commit. See
+`--verify-tag` only stops the command if the tag is not on GitHub yet. It
+does not check which commit the tag names. See
 [Release notes](../../CONTRIBUTING.md#release-notes) for how labels group the
 notes.
 
