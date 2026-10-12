@@ -23,7 +23,8 @@
           "Microsoft.CodeAnalysis.AnalyzerUtilities",
           "Microsoft.CodeAnalysis.BannedApiAnalyzers"
         ],
-        "allowedVersions": "5.0.x"
+        "allowedVersions": "5.0.x",
+        "minimumReleaseAge": "3 days"
       },
       {
         "description": "Automerge lock file maintenance",
