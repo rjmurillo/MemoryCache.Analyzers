@@ -4,27 +4,22 @@
       "config:recommended",
       "helpers:pinGitHubActionDigests"
     ],
-    "labels": ["dependencies"],
+    "enabledManagers": ["nuget", "github-actions"],
+    "labels": ["dependencies", "renovate"],
     "dependencyDashboardLabels": ["dependencies"],
     "minimumReleaseAge": "3 days",
     "internalChecksFilter": "strict",
     "packageRules": [
       {
+        "description": "Label major updates so the approval workflow can gate on labels instead of PR title text.",
+        "matchUpdateTypes": ["major"],
+        "addLabels": ["major-update"]
+      },
+      {
         "description": "Automerge non-major updates for development dependencies",
         "matchDepTypes": ["devDependencies"],
         "matchUpdateTypes": ["minor", "patch"],
         "automerge": true
-      },
-      {
-        "description": "Keep the Roslyn compile surface on the .NET 10 floor. Roslyn 5.0 ships in the .NET 10.0.100 SDK and Visual Studio 2026 18.0. Later 5.x releases map to later SDK bands, and an analyzer only loads in a compiler at least as new as the Roslyn it references.",
-        "matchPackageNames": [
-          "Microsoft.CodeAnalysis.CSharp",
-          "Microsoft.CodeAnalysis.CSharp.Workspaces",
-          "Microsoft.CodeAnalysis.AnalyzerUtilities",
-          "Microsoft.CodeAnalysis.BannedApiAnalyzers"
-        ],
-        "allowedVersions": "5.0.x",
-        "minimumReleaseAge": "3 days"
       },
       {
         "description": "Automerge lock file maintenance",
@@ -36,6 +31,47 @@
         "matchUpdateTypes": ["minor", "patch"],
         "matchCurrentVersion": "!/^0/",
         "automerge": true
+      },
+      {
+        "description": "Wait 14 days after a NuGet release before Renovate proposes it. The shipped analyzer runs inside consumers' compilers, so a cooldown gives the ecosystem time to catch a compromised release before it can automerge. Scoped to NuGet so GitHub Actions automerge timing does not change.",
+        "matchManagers": ["nuget"],
+        "matchUpdateTypes": ["minor", "patch"],
+        "matchCurrentVersion": "!/^0/",
+        "minimumReleaseAge": "14 days"
+      },
+      {
+        "description": "Automerge GitHub Actions digest updates. Actions are pinned to commit SHAs, so a digest bump moves the pin within the same version tag.",
+        "matchManagers": ["github-actions"],
+        "matchUpdateTypes": ["digest", "pinDigest"],
+        "automerge": true
+      },
+      {
+        "description": "Keep the Roslyn compile surface on the .NET 10 floor. Roslyn 5.0 ships in the .NET 10.0.100 SDK and Visual Studio 2026 18.0. Later 5.x releases map to later SDK bands, and an analyzer only loads in a compiler at least as new as the Roslyn it references.",
+        "matchPackageNames": [
+          "Microsoft.CodeAnalysis.CSharp",
+          "Microsoft.CodeAnalysis.CSharp.Workspaces",
+          "Microsoft.CodeAnalysis.AnalyzerUtilities",
+          "Microsoft.CodeAnalysis.BannedApiAnalyzers"
+        ],
+        "allowedVersions": "5.0.x",
+        "minimumReleaseAge": "14 days"
+      },
+      {
+        "description": "AnalyzerUtilities is bundled in the shipped analyzer, and System.Formats.Asn1 is a transitive pin for it. Both run inside the consumer's compiler host, so every update needs manual review.",
+        "matchPackageNames": [
+          "Microsoft.CodeAnalysis.AnalyzerUtilities",
+          "System.Formats.Asn1"
+        ],
+        "automerge": false,
+        "addLabels": ["analyzer-compat"],
+        "minimumReleaseAge": "14 days"
+      },
+      {
+        "description": "BenchmarkDotNet pins exact versions of its own dependencies. Review updates by hand and rerun the benchmarks.",
+        "matchPackageNames": ["BenchmarkDotNet"],
+        "automerge": false,
+        "addLabels": ["benchmark-tooling"],
+        "minimumReleaseAge": "14 days"
       }
     ],
     "platformAutomerge": true

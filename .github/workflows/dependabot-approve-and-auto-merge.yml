@@ -1,0 +1,140 @@
+name: Auto-Approve and Auto-Merge Bot PRs
+# SECURITY: This workflow uses pull_request_target, so it runs in the BASE repo
+# context with access to secrets even for fork PRs. Invariants (do not break):
+#   1. NEVER check out or execute PR-head code (no actions/checkout of
+#      github.event.pull_request.head.*, no building/running PR content).
+#   2. NEVER interpolate untrusted PR fields (title, body, branch name) directly
+#      into run: blocks. Pass them through env: instead.
+# See: https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/
+on:
+  pull_request_target:
+    # labeled lets the Renovate job re-check after Renovate applies its labels.
+    types: [opened, synchronize, reopened, labeled]
+
+permissions: {}
+
+jobs:
+  dependabot:
+    name: Dependabot
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-24.04-arm
+    # Require the bot to be both the PR author and the account that fired the
+    # event, and the head branch to live in this repository. This keeps fork
+    # PRs, human pushes, and human relabels from triggering an approval.
+    if: >-
+      github.event.action != 'labeled' &&
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      # Fail closed unless every commit is authored by the bot, committed by
+      # GitHub (web-flow), and carries a GitHub-verified signature. The author
+      # login alone comes from the commit email, which anyone can set. This
+      # does not stop a user with write access, who can already merge because
+      # the ruleset requires no approvals.
+      - name: Check commit provenance
+        run: |
+          commits="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' | sort -u)"
+          echo "Commits (author committer verified): $(paste -sd, <<< "$commits")"
+          if [ "$commits" != "$BOT web-flow true" ]; then
+            echo "::error::A commit is not a GitHub-signed commit by $BOT. Not approving."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BOT: dependabot[bot]
+
+      - name: Fetch metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: "${{ github.token }}"
+
+      - name: Approve PR
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ github.token }}
+
+      # A merge made with github.token does not trigger push workflows on main.
+      # Set the GH_ACTIONS_PR_WRITE secret to a token with pull request write
+      # access to keep those runs. Without it, the job falls back to github.token.
+      - name: Enable auto-merge for non-major updates
+        if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GH_ACTIONS_PR_WRITE || github.token }}
+
+  renovate:
+    name: Renovate
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-24.04-arm
+    if: >-
+      github.actor == 'renovate[bot]' &&
+      github.event.pull_request.user.login == 'renovate[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    # Renovate adds several labels in one call, and each one fires a labeled
+    # event. Keep only the newest run per PR to avoid duplicate approvals.
+    concurrency:
+      group: renovate-approve-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      # Renovate handles auto-merge through platformAutomerge and the
+      # per-package automerge rules in renovate.json. This job only approves
+      # non-major updates. Packages with automerge: false (analyzer-compat,
+      # benchmark-tooling) still need a manual merge.
+      #
+      # Renovate opens the PR first and adds labels in a second API call, so
+      # the opened event has no labels yet. The gate reads labels from the API
+      # and fails closed: it approves only when the renovate label is present
+      # and major-update is absent. The labeled trigger re-runs the check once
+      # Renovate adds its labels.
+      # Fail closed unless every commit is authored by the bot, committed by
+      # GitHub (web-flow), and carries a GitHub-verified signature. The author
+      # login alone comes from the commit email, which anyone can set. This
+      # does not stop a user with write access, who can already merge because
+      # the ruleset requires no approvals.
+      - name: Check commit provenance
+        run: |
+          commits="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' | sort -u)"
+          echo "Commits (author committer verified): $(paste -sd, <<< "$commits")"
+          if [ "$commits" != "$BOT web-flow true" ]; then
+            echo "::error::A commit is not a GitHub-signed commit by $BOT. Not approving."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BOT: renovate[bot]
+
+      - name: Check update labels
+        id: labels
+        run: |
+          labels="$(gh pr view "$PR_URL" --json labels --jq '.labels[].name')"
+          if grep -qxF 'renovate' <<< "$labels" && ! grep -qxF 'major-update' <<< "$labels"; then
+            approve=true
+          else
+            approve=false
+          fi
+          echo "Labels: $(paste -sd, <<< "$labels"); approve=$approve"
+          echo "approve=$approve" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+
+      - name: Approve PR
+        if: steps.labels.outputs.approve == 'true'
+        run: gh pr review --approve "$PR_URL"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
