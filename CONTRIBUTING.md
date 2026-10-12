@@ -8,6 +8,10 @@ Thank you for contributing. By participating, you agree to follow the
 Install the .NET SDK selected by [`global.json`](global.json). Run all commands
 from the repository root.
 
+Local builds and tests need no environment variables and no `.env` file. For
+the variables CI uses, see
+[Environment variables](AGENTS.md#environment-variables) in `AGENTS.md`.
+
 ### Git hooks
 
 The repository uses [Husky.Net](https://alirezanet.github.io/Husky.Net/) to run
