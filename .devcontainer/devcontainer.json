@@ -1,0 +1,21 @@
+{
+  "name": "MemoryCache.Analyzers",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "10.0"
+    },
+    "ghcr.io/devcontainers/features/powershell:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "EditorConfig.EditorConfig",
+        "DavidAnson.vscode-markdownlint"
+      ]
+    }
+  },
+  "postCreateCommand": "dotnet restore MemoryCache.Analyzers.sln && dotnet tool restore"
+}
