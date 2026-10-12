@@ -1,6 +1,6 @@
 # Install MemoryCache.Analyzers
 
-MemoryCache.Analyzers is currently available only as the `0.1.0-alpha` prerelease package.
+The current stable version of MemoryCache.Analyzers is `0.1.0`.
 
 ## Requirements
 
@@ -16,15 +16,14 @@ The analyzer targets .NET Standard 2.0 and uses Roslyn 4.8. The .NET 8.0.100 SDK
 Run this command in the folder that contains the project file:
 
 ```shell
-dotnet add package MemoryCache.Analyzers --prerelease
+dotnet add package MemoryCache.Analyzers
 ```
 
-The `--prerelease` option is required because no stable version is available. To pin the current version in a
-project file, use:
+To pin the current version in a project file, use:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0-alpha" PrivateAssets="all" />
+  <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0" PrivateAssets="all" />
 </ItemGroup>
 ```
 
@@ -39,7 +38,7 @@ folder and its subfolders:
 ```xml
 <Project>
   <ItemGroup>
-    <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0-alpha" PrivateAssets="all" />
+    <PackageReference Include="MemoryCache.Analyzers" Version="0.1.0" PrivateAssets="all" />
   </ItemGroup>
 </Project>
 ```
@@ -58,7 +57,7 @@ With NuGet central package management, declare the version in `Directory.Package
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="MemoryCache.Analyzers" Version="0.1.0-alpha" />
+    <PackageVersion Include="MemoryCache.Analyzers" Version="0.1.0" />
   </ItemGroup>
 </Project>
 ```
@@ -94,7 +93,7 @@ dotnet build --no-incremental
 
 The build should report `warning SRC1000` on the `new MemoryCache` expression. If no warning appears, check that:
 
-- The project restored `MemoryCache.Analyzers` version `0.1.0-alpha`.
+- The project restored `MemoryCache.Analyzers` version `0.1.0`.
 - The project references `System.Runtime.Caching`.
 - The project targets .NET Core or .NET 5 or later. SRC1000 is silent on .NET Framework.
 - The package reference applies to the project and has not been hidden by a closer `Directory.Build.props` file.
