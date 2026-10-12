@@ -8,6 +8,25 @@ Thank you for contributing. By participating, you agree to follow the
 Install the .NET SDK selected by [`global.json`](global.json). Run all commands
 from the repository root.
 
+### Git hooks
+
+The repository uses [Husky.Net](https://alirezanet.github.io/Husky.Net/) to run
+checks before you commit and push. Run these commands once after you clone:
+
+```shell
+dotnet tool restore
+dotnet husky install
+```
+
+The hooks do the following:
+
+- `pre-commit` checks the format of staged C# files. The commit fails if
+  `dotnet format` would change them.
+- `pre-push` builds the solution with warnings as errors, then runs the tests.
+  The push fails if either step fails.
+
+Task definitions live in [`.husky/task-runner.json`](.husky/task-runner.json).
+
 ## Build and test
 
 Restore dependencies:
