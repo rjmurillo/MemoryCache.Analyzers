@@ -20,13 +20,30 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-24.04-arm
-    # Gate on the PR author and a same-repo head branch, not github.actor.
-    # github.actor is whoever fired the event, which a fork PR can influence.
+    # Require the bot to be both the PR author and the account that fired the
+    # event, and the head branch to live in this repository. This keeps fork
+    # PRs, human pushes, and human relabels from triggering an approval.
     if: >-
       github.event.action != 'labeled' &&
+      github.actor == 'dependabot[bot]' &&
       github.event.pull_request.user.login == 'dependabot[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository
     steps:
+      # Fail closed if anyone but the bot authored a commit on this branch.
+      - name: Check commit authors
+        run: |
+          authors="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].author.login // "unknown"' | sort -u)"
+          echo "Commit authors: $(paste -sd, <<< "$authors")"
+          if [ "$authors" != "$BOT" ]; then
+            echo "::error::Commits from someone other than $BOT. Not approving."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BOT: dependabot[bot]
+
       - name: Fetch metadata
         id: dependabot-metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
@@ -56,6 +73,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-24.04-arm
     if: >-
+      github.actor == 'renovate[bot]' &&
       github.event.pull_request.user.login == 'renovate[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository
     # Renovate adds several labels in one call, and each one fires a labeled
@@ -74,6 +92,21 @@ jobs:
       # and fails closed: it approves only when the renovate label is present
       # and major-update is absent. The labeled trigger re-runs the check once
       # Renovate adds its labels.
+      # Fail closed if anyone but the bot authored a commit on this branch.
+      - name: Check commit authors
+        run: |
+          authors="$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].author.login // "unknown"' | sort -u)"
+          echo "Commit authors: $(paste -sd, <<< "$authors")"
+          if [ "$authors" != "$BOT" ]; then
+            echo "::error::Commits from someone other than $BOT. Not approving."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BOT: renovate[bot]
+
       - name: Check update labels
         id: labels
         run: |
