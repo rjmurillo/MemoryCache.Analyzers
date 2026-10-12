@@ -11,7 +11,7 @@
     "internalChecksFilter": "strict",
     "packageRules": [
       {
-        "description": "Label major updates so the approval workflow can gate on labels instead of PR title text.",
+        "description": "Label major updates. They do not automerge and need a manual merge.",
         "matchUpdateTypes": ["major"],
         "addLabels": ["major-update"]
       },
