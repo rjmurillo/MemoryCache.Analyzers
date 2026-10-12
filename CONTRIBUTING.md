@@ -168,6 +168,12 @@ Keep each pull request focused. Describe the change and include the commands
 and results used to verify formatting, the build, and tests. Update
 documentation whenever rule behavior or metadata changes.
 
+### CI timing
+
+Each CI run publishes a step timing table in the job summary for each build
+job. The run also uploads a `step-timings-<os>` artifact with the same data as
+JSON. Compare these files across runs to spot slower builds.
+
 ## Release notes
 
 Release notes come from merged pull requests. GitHub groups them by label, as
