@@ -139,6 +139,16 @@ The table lists the labels added for this system and their meaning.
 | `area: ci` | GitHub Actions in `.github/workflows`. |
 | `area: release` | Versioning, packaging, and NuGet publishing. |
 
+## Flaky tests
+
+A flaky test passes in some runs and fails in others with no code change.
+
+- The "Test stability" workflow runs every week. You can also start it by hand
+  from the Actions tab. It builds once, runs the test suite several times, and
+  lists any test that failed in some runs.
+- If it reports a test, open a bug with the labels `bug` and `area: tests`.
+  Then fix the cause. Do not add retries. Retries hide flaky tests.
+
 ## Pull requests
 
 Keep each pull request focused. Describe the change and include the commands
