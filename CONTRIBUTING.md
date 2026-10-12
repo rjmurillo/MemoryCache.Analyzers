@@ -69,8 +69,49 @@ Name each rule page after its diagnostic ID, for example
 
 Verify every behavior statement against the analyzer implementation and tests.
 
+## Labels
+
+Labels help people and agents filter work by type, area, and priority.
+
+- Every issue gets one type label: `bug`, `enhancement`, `documentation`,
+  `chore`, or `dependencies`.
+- Every issue gets one or more `area:` labels.
+- Maintainers set one `priority:` label when they triage the issue.
+
+The table lists the labels added for this system and their meaning.
+
+| Label | Meaning |
+| --- | --- |
+| `priority: P0` | Critical. Fix now. |
+| `priority: P1` | High. Fix in the next release. |
+| `priority: P2` | Medium. Plan it. |
+| `priority: P3` | Low. Nice to have. |
+| `chore` | Maintenance with no user-facing change. |
+| `dependencies` | Dependency updates. |
+| `area: analyzer` | Analyzer code in `src/`. |
+| `area: tests` | Tests in `tests/`. |
+| `area: docs` | Docs in `docs/` and root markdown. |
+| `area: build` | MSBuild files in `build/` and `Directory.*`. |
+| `area: ci` | GitHub Actions in `.github/workflows`. |
+| `area: release` | Versioning, packaging, and NuGet publishing. |
+
 ## Pull requests
 
 Keep each pull request focused. Describe the change and include the commands
 and results used to verify formatting, the build, and tests. Update
 documentation whenever rule behavior or metadata changes.
+
+## Release notes
+
+Release notes come from merged pull requests. GitHub groups them by label, as
+set in [`.github/release.yml`](.github/release.yml). Add the
+`ignore-for-release` label to leave a pull request out of the notes.
+
+Create the release with generated notes:
+
+```shell
+gh release create vX.Y.Z --generate-notes --verify-tag
+```
+
+Copy the important lines into [`CHANGELOG.md`](CHANGELOG.md) in the same
+release pull request that bumps `version.json`.
