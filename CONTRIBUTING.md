@@ -97,3 +97,18 @@ The table lists the labels added for this system and their meaning.
 Keep each pull request focused. Describe the change and include the commands
 and results used to verify formatting, the build, and tests. Update
 documentation whenever rule behavior or metadata changes.
+
+## Release notes
+
+Release notes come from merged pull requests. GitHub groups them by label, as
+set in [`.github/release.yml`](.github/release.yml). Add the
+`ignore-for-release` label to leave a pull request out of the notes.
+
+Create the release with generated notes:
+
+```shell
+gh release create vX.Y.Z --generate-notes --verify-tag
+```
+
+Copy the important lines into [`CHANGELOG.md`](CHANGELOG.md) in the same
+release pull request that bumps `version.json`.
