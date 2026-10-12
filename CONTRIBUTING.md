@@ -193,6 +193,8 @@ A flaky test passes in some runs and fails in others with no code change.
 Keep each pull request focused. Describe the change and include the commands
 and results used to verify formatting, the build, and tests. Update
 documentation whenever rule behavior or metadata changes.
+`AgentsDocumentationTests` checks that paths and commands in `AGENTS.md` stay
+correct.
 
 ### CI timing
 
