@@ -50,6 +50,8 @@ Build with warnings treated as errors:
 dotnet build MemoryCache.Analyzers.sln --no-restore /p:PedanticMode=true
 ```
 
+The build reports unused references as `RT0001`-`RT0003` warnings.
+
 Run the full test suite with the repository settings:
 
 ```shell
