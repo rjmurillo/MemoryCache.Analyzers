@@ -75,6 +75,19 @@ Run the full test suite with the repository settings:
 dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/tests/test.runsettings
 ```
 
+The full test run fails if line or branch coverage is below 100%. The
+coverage report is in `artifacts/TestResults/coverage`.
+
+A filtered test run covers less code, so it reports low coverage. For a
+filtered run, turn off the check with `-p:EnforceCoverageThreshold=false`:
+
+```shell
+dotnet test MemoryCache.Analyzers.sln \
+  --settings ./build/targets/tests/test.runsettings \
+  --filter "FullyQualifiedName~HelpLinkTargetsRuleDocumentation" \
+  -p:EnforceCoverageThreshold=false
+```
+
 ## Benchmarks
 
 The `tests/MemoryCache.Analyzers.Benchmarks` project measures analyzer time and
@@ -180,6 +193,8 @@ A flaky test passes in some runs and fails in others with no code change.
 Keep each pull request focused. Describe the change and include the commands
 and results used to verify formatting, the build, and tests. Update
 documentation whenever rule behavior or metadata changes.
+`AgentsDocumentationTests` checks that paths and commands in `AGENTS.md` stay
+correct.
 
 ### CI timing
 
