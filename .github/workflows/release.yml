@@ -16,8 +16,9 @@ on:
 
 # A release made with a new tag fires both events. Run them one at a time.
 # The second run sees the package on NuGet and skips it.
+# Every event runs on the tag ref, so the tag name keys the group.
 concurrency:
-  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.expected-version || github.ref_name }}
+  group: release-${{ github.ref_name }}
   cancel-in-progress: false
 
 permissions:
