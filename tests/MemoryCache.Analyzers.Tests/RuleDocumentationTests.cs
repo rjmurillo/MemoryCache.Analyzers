@@ -19,7 +19,6 @@ public sealed class RuleDocumentationTests
     private static readonly string HeaderLine = "| ID | Category | Severity | Code fix | Title | Implementation file |";
     private static readonly string SeparatorLine = "| --- | --- | --- | --- | --- | --- |";
     private static readonly string UpdateVariable = "UPDATE_RULE_DOCS";
-    private static readonly string SolutionFileName = "MemoryCache.Analyzers.sln";
 
     private static Assembly AnalyzerAssembly => typeof(SystemRuntimeCachingAnalyzer).Assembly;
 
@@ -30,7 +29,7 @@ public sealed class RuleDocumentationTests
     [Fact]
     public void RulesTableMatchesAnalyzerMetadata()
     {
-        string readmePath = Path.Combine(FindRepositoryRoot(), "docs", "rules", "README.md");
+        string readmePath = Path.Combine(RepositoryRoot.Find(), "docs", "rules", "README.md");
         string expected = BuildRulesTable();
         string actual = File.ReadAllText(readmePath).Replace("\r\n", "\n", StringComparison.Ordinal);
 
@@ -51,35 +50,13 @@ public sealed class RuleDocumentationTests
     [Fact]
     public void EveryRuleHasARulePage()
     {
-        string rulesDirectory = Path.Combine(FindRepositoryRoot(), "docs", "rules");
+        string rulesDirectory = Path.Combine(RepositoryRoot.Find(), "docs", "rules");
 
         foreach ((DiagnosticDescriptor descriptor, _) in GetDescriptors())
         {
             string rulePage = Path.Combine(rulesDirectory, descriptor.Id + ".md");
             Assert.True(File.Exists(rulePage), $"Missing rule page: docs/rules/{descriptor.Id}.md");
         }
-    }
-
-    private static string FindRepositoryRoot()
-    {
-        return FindRepositoryRoot(AppContext.BaseDirectory, SolutionFileName);
-    }
-
-    private static string FindRepositoryRoot(string start, string solutionFileName)
-    {
-        DirectoryInfo? directory = new(start);
-
-        while (directory is not null)
-        {
-            if (File.Exists(Path.Combine(directory.FullName, solutionFileName)))
-            {
-                return directory.FullName;
-            }
-
-            directory = directory.Parent;
-        }
-
-        throw new InvalidOperationException($"Could not find {solutionFileName} above {start}.");
     }
 
     private static string BuildRulesTable()

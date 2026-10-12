@@ -6,6 +6,10 @@
 
     <_TestCoverageGlob>$(ArtifactsTestResultsPath)/**/*.cobertura.xml</_TestCoverageGlob>
     <_TestCoverageReportDirectory>$(ArtifactsTestResultsPath)/coverage</_TestCoverageReportDirectory>
+
+    <MinimumLineCoverage Condition="'$(MinimumLineCoverage)' == ''">1.0</MinimumLineCoverage>
+    <MinimumBranchCoverage Condition="'$(MinimumBranchCoverage)' == ''">1.0</MinimumBranchCoverage>
+    <EnforceCoverageThreshold Condition="'$(EnforceCoverageThreshold)' == ''">true</EnforceCoverageThreshold>
   </PropertyGroup>
 
   <Target Name="CleanCoverageReport" BeforeTargets="Test;VSTest" Condition=" '$(IsTestProject)' == 'true' ">
@@ -31,5 +35,18 @@
       ReportFiles="@(_CoverageFiles)"
       TargetDirectory="$(_TestCoverageReportDirectory)"
       ReportTypes="MarkdownSummaryGithub;Cobertura;HtmlInline" />
+  </Target>
+
+  <Target Name="EnforceCoverageThreshold"
+          AfterTargets="GenerateCoverageReport"
+          Condition=" '$(IsTestProject)' == 'true' and '$(EnforceCoverageThreshold)' == 'true' and Exists('$(_TestCoverageReportDirectory)/Cobertura.xml') ">
+    <PropertyGroup>
+      <_CoberturaText>$([System.IO.File]::ReadAllText('$(_TestCoverageReportDirectory)/Cobertura.xml'))</_CoberturaText>
+      <_LineRate>$([System.Text.RegularExpressions.Regex]::Replace($(_CoberturaText), '(?s)^.*?&lt;coverage\s[^>]*?line-rate="([0-9.]+)".*$', '$1'))</_LineRate>
+      <_BranchRate>$([System.Text.RegularExpressions.Regex]::Replace($(_CoberturaText), '(?s)^.*?&lt;coverage\s[^>]*?branch-rate="([0-9.]+)".*$', '$1'))</_BranchRate>
+    </PropertyGroup>
+    <Message Importance="high" Text="Coverage: line $(_LineRate), branch $(_BranchRate). Minimum: line $(MinimumLineCoverage), branch $(MinimumBranchCoverage)." />
+    <Error Condition=" $(_LineRate) &lt; $(MinimumLineCoverage) " Text="Line coverage $(_LineRate) is below $(MinimumLineCoverage)." />
+    <Error Condition=" $(_BranchRate) &lt; $(MinimumBranchCoverage) " Text="Branch coverage $(_BranchRate) is below $(MinimumBranchCoverage)." />
   </Target>
 </Project>

@@ -13,6 +13,7 @@ public class SystemRuntimeCachingAnalyzerTests
         {
             ["""var cache = {|SRC1000:new MemoryCache("test")|};"""],
             ["""var cache = MemoryCache.Default; cache.Set("test", "value", System.DateTimeOffset.UtcNow.AddMinutes(1)); var value = cache.Get("test");"""],
+            ["""var other = new object();"""],
         }.WithSystemRuntimeCachingNamespaces().WithNet80SystemRuntimeCaching();
 
         IEnumerable<object[]> netStandard20SystemRuntimeCaching = new object[][]
@@ -51,6 +52,32 @@ public class SystemRuntimeCachingAnalyzerTests
 
         Assert.StartsWith("https://github.com/rjmurillo/MemoryCache.Analyzers/blob/", diagnostic.HelpLinkUri, StringComparison.Ordinal);
         Assert.EndsWith("/docs/rules/SRC1000.md", diagnostic.HelpLinkUri, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task FlagsCreationOfTypeDerivedFromMemoryCache()
+    {
+        await Verifier.VerifyAnalyzerAsync(
+            """
+            using System.Runtime.Caching;
+
+            class DerivedCache : MemoryCache
+            {
+                public DerivedCache()
+                    : base("derived")
+                {
+                }
+            }
+
+            class C
+            {
+                void M()
+                {
+                    var cache = {|SRC1000:new DerivedCache()|};
+                }
+            }
+            """,
+            ReferenceAssemblyCatalog.Net80WithSystemRuntimeCaching);
     }
 
     [Theory]
