@@ -4,6 +4,10 @@ namespace MemoryCache.Analyzers;
 
 internal static class CompilationExtensions
 {
+    // .NET Framework 4.x ships mscorlib as version 4.0.0.0. An mscorlib with this
+    // major version or higher is treated as .NET Core era, not .NET Framework.
+    private static readonly int FirstNetCoreMscorlibMajorVersion = 5;
+
     /// <summary>
     /// Determines whether the provided compilation is targeting the classic .NET Framework.
     /// </summary>
@@ -37,7 +41,7 @@ internal static class CompilationExtensions
                 return false;
             }
 
-            if (identity.Version.Major >= 5)
+            if (identity.Version.Major >= FirstNetCoreMscorlibMajorVersion)
             {
                 return false;
             }
