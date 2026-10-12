@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryCache.Analyzers", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryCache.Analyzers.Tests", "tests\MemoryCache.Analyzers.Tests\MemoryCache.Analyzers.Tests.csproj", "{2395ABB8-22D3-BB20-0BD8-B9F786249F2C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryCache.Analyzers.Benchmarks", "tests\MemoryCache.Analyzers.Benchmarks\MemoryCache.Analyzers.Benchmarks.csproj", "{6C36754A-84A5-4F69-A063-32D60003043A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2395ABB8-22D3-BB20-0BD8-B9F786249F2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2395ABB8-22D3-BB20-0BD8-B9F786249F2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2395ABB8-22D3-BB20-0BD8-B9F786249F2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C36754A-84A5-4F69-A063-32D60003043A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C36754A-84A5-4F69-A063-32D60003043A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C36754A-84A5-4F69-A063-32D60003043A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C36754A-84A5-4F69-A063-32D60003043A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

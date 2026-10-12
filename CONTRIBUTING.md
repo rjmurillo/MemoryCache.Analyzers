@@ -56,6 +56,19 @@ Run the full test suite with the repository settings:
 dotnet test MemoryCache.Analyzers.sln --no-build --settings ./build/targets/tests/test.runsettings
 ```
 
+## Benchmarks
+
+The `tests/MemoryCache.Analyzers.Benchmarks` project measures analyzer time and
+memory with BenchmarkDotNet. CI builds it but does not run it. Run all
+benchmarks in Release mode:
+
+```shell
+dotnet run -c Release --project tests/MemoryCache.Analyzers.Benchmarks -- --filter="*"
+```
+
+BenchmarkDotNet writes reports to `BenchmarkDotNet.Artifacts/results/`. Paste
+the `*-report-github.md` table into your pull request when you run benchmarks.
+
 ## Add or change a rule
 
 1. Choose the next available diagnostic ID from the category range in

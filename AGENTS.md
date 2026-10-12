@@ -30,9 +30,15 @@ claims against them.
 - `docs/rules/` contains the diagnostic index and rule pages.
 - `build/targets/` contains shared build and test configuration.
 
-The repository does not contain a code fix project or a benchmark project. Do
-not claim that a code fix or benchmark exists. Follow
-`CLAUDE.md` for requirements that apply when adding an analyzer.
+The repository does not contain a code fix project. Do not claim that a code
+fix exists. `tests/MemoryCache.Analyzers.Benchmarks/` holds BenchmarkDotNet
+benchmarks for the analyzer. Run them from the repository root:
+
+```shell
+dotnet run -c Release --project tests/MemoryCache.Analyzers.Benchmarks -- --filter="*"
+```
+
+Follow `CLAUDE.md` for requirements that apply when adding an analyzer.
 
 ## Change requirements
 
