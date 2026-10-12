@@ -165,6 +165,18 @@ The table lists the labels added for this system and their meaning.
 | `area: ci` | GitHub Actions in `.github/workflows`. |
 | `area: release` | Versioning, packaging, and NuGet publishing. |
 
+## Dependency updates
+
+Renovate and Dependabot open dependency pull requests. Settings live in
+`renovate.json` and
+`.github/workflows/dependabot-approve-and-auto-merge.yml`.
+
+- Minor and patch updates merge on their own once required checks pass.
+- NuGet minor and patch updates wait 14 days after release.
+- Major updates get the `major-update` label and need a manual merge.
+- `analyzer-compat` and `benchmark-tooling` updates need a manual merge.
+- Roslyn packages stay on 5.0.x, the .NET 10 SDK floor.
+
 ## Flaky tests
 
 A flaky test passes in some runs and fails in others with no code change.
