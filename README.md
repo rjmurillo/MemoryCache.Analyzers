@@ -1,6 +1,6 @@
 # MemoryCache.Analyzers
 
-[![NuGet Version](https://img.shields.io/nuget/vpre/MemoryCache.Analyzers?style=flat&logo=nuget&color=blue)](https://www.nuget.org/packages/MemoryCache.Analyzers)
+[![NuGet Version](https://img.shields.io/nuget/v/MemoryCache.Analyzers?style=flat&logo=nuget&color=blue)](https://www.nuget.org/packages/MemoryCache.Analyzers)
 [![Main build](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml/badge.svg)](https://github.com/rjmurillo/MemoryCache.Analyzers/actions/workflows/main.yml)
 
 **MemoryCache.Analyzers** is a Roslyn analyzer that identifies creation of
