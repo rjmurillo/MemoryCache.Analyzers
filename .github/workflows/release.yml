@@ -41,7 +41,7 @@ jobs:
 
   publish:
     needs: build
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     timeout-minutes: 15
     # Required reviewers on this environment approve each publish.
     # The nuget.org trusted publishing policy only accepts this environment.
