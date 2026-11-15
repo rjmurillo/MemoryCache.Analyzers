@@ -17,6 +17,14 @@ jobs:
   stability:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
+    env:
+      # The .NET 11 test platform verifies the Unix directory that holds the
+      # test session artifacts. On the GitHub ARM runners the fallback
+      # directory (/run/user/<uid>) fails that verification after every test
+      # passes, which fails the test run. The directory is owned by the
+      # runner image, not by this repo, so skip the verification in CI.
+      # Same fix as the build job in main.yml (PR #147).
+      VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
