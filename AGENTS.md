@@ -56,6 +56,19 @@ Follow `CLAUDE.md` for requirements that apply when adding an analyzer.
 - Give public APIs practical XML documentation.
 - Use complete, compilable examples in rule documentation.
 
+## Dependency and workflow facts
+
+- Package versions use Central Package Management. A version bump in
+  `Directory.Packages.props` is complete by itself. The repository has no
+  NuGet lock files, so do not add one with a bump.
+- When a workflow calls `main.yml` through `workflow_call`, pass only the
+  secrets it declares. Today that is `CODACY_PROJECT_TOKEN`. Do not use
+  `secrets: inherit`.
+- The 100% coverage rule covers the analyzer assembly only. See the
+  `ModulePath` filter in `build/targets/tests/test.runsettings`. A workflow
+  step that fails closed, such as the version check in
+  `.github/workflows/release.yml`, needs no unit test.
+
 ## Required verification
 
 Run these commands from the repository root:

@@ -22,6 +22,10 @@ Create a branch from `main` and make these changes:
    [`AnalyzerReleases.Shipped.md`](../../src/MemoryCache.Analyzers/AnalyzerReleases.Shipped.md).
    Leave the header comment lines in the unshipped file. Skip this step if
    the unshipped file has no rules.
+4. Replace the old version with `X.Y.Z` in the install docs. These are
+   [`README.md`](../../README.md), [`install.md`](../install.md),
+   [`configuration.md`](../configuration.md), and [`qa.md`](../qa.md).
+   Find any others with `git grep -n "<old version>" -- README.md docs`.
 
 Open a pull request with these changes.
 
