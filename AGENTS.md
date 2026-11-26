@@ -60,17 +60,19 @@ Follow `CLAUDE.md` for requirements that apply when adding an analyzer.
 
 - Package versions use Central Package Management. They live in
   `Directory.Packages.props` or a `Packages.props` file under
-  `build/targets/`. The repository has no NuGet lock files, so a version bump
-  needs no lock file change. The Roslyn hold noted in
-  `Directory.Packages.props` still applies.
+  `build/targets/`. Tool versions live in `.config/dotnet-tools.json`. When a
+  package and a tool share a version, bump both.
+- The repository has no NuGet lock files. A version bump needs no lock file
+  change.
+- Keep the `Microsoft.CodeAnalysis` packages at 5.0.x. The comment in
+  `Directory.Packages.props` explains why.
 - When a workflow calls `main.yml` through `workflow_call`, pass only the
   secrets it declares. Today that is `CODACY_PROJECT_TOKEN`. Do not use
   `secrets: inherit`.
-- The coverage gate measures only the analyzer assembly. See the
-  `ModulePath` filter in `build/targets/tests/test.runsettings`. Workflow
-  files have no test harness. Do not build one to test a workflow step that
-  stops the job on bad input, such as the version check in
-  `.github/workflows/release.yml`. Prove a workflow change with a CI run.
+- The 100% coverage gate in `build/targets/tests/Tests.targets` measures
+  only the analyzer assembly. The `ModulePath` filter in
+  `build/targets/tests/test.runsettings` sets that scope. Workflow files are
+  outside it, and the repository has no workflow test harness.
 
 ## Required verification
 
