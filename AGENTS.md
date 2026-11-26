@@ -58,16 +58,19 @@ Follow `CLAUDE.md` for requirements that apply when adding an analyzer.
 
 ## Dependency and workflow facts
 
-- Package versions use Central Package Management. A version bump in
-  `Directory.Packages.props` is complete by itself. The repository has no
-  NuGet lock files, so do not add one with a bump.
+- Package versions use Central Package Management. They live in
+  `Directory.Packages.props` or a `Packages.props` file under
+  `build/targets/`. The repository has no NuGet lock files, so a version bump
+  needs no lock file change. The Roslyn hold noted in
+  `Directory.Packages.props` still applies.
 - When a workflow calls `main.yml` through `workflow_call`, pass only the
   secrets it declares. Today that is `CODACY_PROJECT_TOKEN`. Do not use
   `secrets: inherit`.
-- The 100% coverage rule covers the analyzer assembly only. See the
-  `ModulePath` filter in `build/targets/tests/test.runsettings`. A workflow
-  step that fails closed, such as the version check in
-  `.github/workflows/release.yml`, needs no unit test.
+- The coverage gate measures only the analyzer assembly. See the
+  `ModulePath` filter in `build/targets/tests/test.runsettings`. Workflow
+  files have no test harness. Do not build one to test a workflow step that
+  stops the job on bad input, such as the version check in
+  `.github/workflows/release.yml`. Prove a workflow change with a CI run.
 
 ## Required verification
 
