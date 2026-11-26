@@ -30,7 +30,9 @@ not the version in the tag.
 
 1. Do not move or re-push the existing tag.
 2. Open a pull request that sets `version.json` to the next unused version.
-   Merge it after CI passes.
+   In the same pull request, update the docs that show the package version.
+   See step 4 of [Release a new version](release.md). Merge it after CI
+   passes.
 3. Make a new tag for that version on the merge commit. Follow
    [Release a new version](release.md) from step 3.
 

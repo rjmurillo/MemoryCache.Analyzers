@@ -56,6 +56,24 @@ Follow `CLAUDE.md` for requirements that apply when adding an analyzer.
 - Give public APIs practical XML documentation.
 - Use complete, compilable examples in rule documentation.
 
+## Dependency and workflow facts
+
+- Package versions use Central Package Management. They live in
+  `Directory.Packages.props` or a `Packages.props` file under
+  `build/targets/`. Tool versions live in `.config/dotnet-tools.json`. When a
+  package and a tool share a version, bump both.
+- The repository has no NuGet lock files. A version bump needs no lock file
+  change.
+- Keep the `Microsoft.CodeAnalysis` packages at 5.0.x. The comment in
+  `Directory.Packages.props` explains why.
+- When a workflow calls `main.yml` through `workflow_call`, pass only the
+  secrets it declares. Today that is `CODACY_PROJECT_TOKEN`. Do not use
+  `secrets: inherit`.
+- The 100% coverage gate in `build/targets/tests/Tests.targets` measures
+  only the analyzer assembly. The `ModulePath` filter in
+  `build/targets/tests/test.runsettings` sets that scope. Workflow files are
+  outside it, and the repository has no workflow test harness.
+
 ## Required verification
 
 Run these commands from the repository root:
