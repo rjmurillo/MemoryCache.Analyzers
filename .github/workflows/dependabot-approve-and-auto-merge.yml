@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     # Require the bot to be both the PR author and the account that fired the
     # event, and the head branch to live in this repository. This keeps fork
     # PRs and human pushes from enabling auto-merge.
